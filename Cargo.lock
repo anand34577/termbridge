@@ -3530,7 +3530,7 @@ checksum = "0bf256ce5efdfa370213c1dabab5935a12e49f2c58d15e9eac2870d3b4f27263"
 
 [[package]]
 name = "termbridge"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -3547,7 +3547,7 @@ dependencies = [
 
 [[package]]
 name = "termbridge-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono",
  "dirs",
@@ -3561,7 +3561,7 @@ dependencies = [
 
 [[package]]
 name = "termbridge-gui"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "base64",
  "chrono",
@@ -3575,7 +3575,7 @@ dependencies = [
 
 [[package]]
 name = "termbridge-mcp"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "axum",
@@ -3590,7 +3590,7 @@ dependencies = [
 
 [[package]]
 name = "termbridge-tui"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "chrono",

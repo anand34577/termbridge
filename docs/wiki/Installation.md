@@ -57,7 +57,7 @@ new terminal and check:
 termbridge --version
 ```
 
-You should see `termbridge 0.1.0`.
+You should see `termbridge 0.1.1`.
 
 Most USB-to-serial adapters (FTDI, CP210x, CH340, PL2303) install their drivers
 automatically through Windows Update. If the port does not appear in Device
@@ -95,7 +95,7 @@ for a carrier signal and often seem to hang.
 **Package.** Download the `.deb` for your architecture and install it:
 
 ```bash
-sudo apt install ./termbridge_0.1.0_arm64.deb
+sudo apt install ./termbridge_0.1.1_arm64.deb
 ```
 
 That puts `termbridge` in `/usr/bin` and the licence notices in

@@ -166,17 +166,16 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $version = "${{ github.ref_name }}".TrimStart('v')
-          # WiX v3 only knows x86, x64 and ia64 as Package platforms. ARM64
-          # packages are built as x64 and marked with the arm64 summary
-          # information below, which is how WiX v3 ships ARM64 installers.
-          $platform = 'x64'
-          $summaryArch = if ("${{ matrix.target }}" -like 'aarch64*') { 'arm64' } else { 'x64' }
+          # The target architecture is passed to candle with -arch (WiX 3.14
+          # knows x64 and arm64). It sets the package platform and marks every
+          # component 64-bit, so the source below names neither.
+          $arch = if ("${{ matrix.target }}" -like 'aarch64*') { 'arm64' } else { 'x64' }
           $wxs = @"
           <?xml version="1.0" encoding="UTF-8"?>
           <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
             <Product Id="*" Name="Termbridge" Language="1033" Version="$version"
                      Manufacturer="Termbridge contributors" UpgradeCode="7f2c9a54-3b1e-4c8d-9a6f-2e5d81c4b730">
-              <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="$platform"/>
+              <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine"/>
               <MajorUpgrade DowngradeErrorMessage="A newer version is already installed."/>
               <MediaTemplate EmbedCab="yes"/>
               <Directory Id="TARGETDIR" Name="SourceDir">
@@ -185,7 +184,7 @@ jobs:
                 </Directory>
               </Directory>
               <DirectoryRef Id="INSTALLFOLDER">
-                <Component Id="MainExe" Guid="*" Win64="yes">
+                <Component Id="MainExe" Guid="*">
                   <File Id="TermbridgeExe" Source="pkg\${env:BIN}-${{ matrix.target }}.exe" KeyPath="yes"/>
                 </Component>
               </DirectoryRef>
@@ -197,11 +196,10 @@ jobs:
           </Wix>
           "@
           Set-Content -Path main.wxs -Value $wxs -Encoding UTF8
-          candle.exe -nologo -out main.wixobj main.wxs
-          # -arch sets the summary information that makes the package install on
-          # ARM64. Without it an ARM64 build would be rejected as wrong-platform.
-          light.exe -nologo -arch $summaryArch `
-            -out "${env:BIN}-${{ matrix.target }}.msi" main.wixobj
+          candle.exe -nologo -arch $arch -out main.wixobj main.wxs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          light.exe -nologo -out "${env:BIN}-${{ matrix.target }}.msi" main.wixobj
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - uses: actions/upload-artifact@v4
         with:

@@ -63,7 +63,7 @@ You should see `active (running)`. Check the endpoint:
 curl -s http://127.0.0.1:8765/health
 ```
 
-You should get `{"name":"termbridge","protocolVersion":"2025-06-18","sessions":0,"status":"ok","version":"0.1.0"}`. Logs are in `journalctl -u termbridge -f`.
+You should get `{"name":"termbridge","protocolVersion":"2025-06-18","sessions":0,"status":"ok","version":"0.1.1"}`. Logs are in `journalctl -u termbridge -f`.
 
 ### 4. Reach it from your computer
 
