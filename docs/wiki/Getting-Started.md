@@ -42,7 +42,7 @@ If something is wrong (a baud rate out of range, a port that's already open), th
 
 The terminal shows your command tagged **TX** in amber and the reply tagged **RX** in teal. The byte preview on the right of the composer shows exactly what was sent, for example `4 B  41 54 0D 0A`.
 
-Special characters work as escapes: `\r` (carriage return), `\n` (line feed), `\x1B` (any byte in hex), `$0D` and `\#013` (Hercules-style hex and decimal). Switch the composer to **Hex** to type raw bytes like `01 03 00 00 00 0A`.
+Special characters work as escapes: `\r` (carriage return), `\n` (line feed), `\x1B` (any byte in hex), `$0D` and `\#013` (hex and decimal). Switch the composer to **Hex** to type raw bytes like `01 03 00 00 00 0A`.
 
 ## 5. Look at the data
 

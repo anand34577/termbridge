@@ -1,6 +1,6 @@
-//! UDP broadcast discovery, inspired by the Hercules "UDP Config" tab.
+//! UDP broadcast discovery.
 //!
-//! The HWg discovery payload itself is device specific, so the probe payload is
+//! The discovery payload itself is device specific, so the probe payload is
 //! configurable. Every datagram received during the listen window is reported
 //! with its sender address, RTT and both hex and ASCII renderings.
 

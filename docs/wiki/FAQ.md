@@ -1,8 +1,8 @@
 # FAQ
 
-### Is this Hercules?
+### What escape syntax does it use for control bytes?
 
-No. It's an independent program inspired by HW group's Hercules SETUP utility and uses a similar escape style for typing control bytes (`$0D`, `\#013`). It doesn't share code with Hercules and isn't affiliated with HW group.
+Text mode accepts `\r`, `\n`, `\t`, `\0`, `\xNN` for any byte, `$NN` for hex and `\#NNN` for decimal, so `$0D` and `\#013` both produce a carriage return. `$$`, `##` and `<<` give a literal `$`, `#` or `<`. Switch the composer to **Hex** to type raw bytes directly.
 
 ### Does it support RS-485?
 

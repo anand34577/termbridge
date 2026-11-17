@@ -9,7 +9,7 @@ Serial MCP is a serial, TCP and UDP terminal for people who work with devices: P
 
 ## Why
 
-Hercules SETUP has been a favourite bench terminal for years, but it's a Windows-only desktop program. Serial MCP keeps the same idea (pick a port, see every byte, send anything) and runs on Windows, macOS and Linux, including ARM boards and SSH sessions. The MCP server means an agent can open a port, send a Modbus request with the right CRC, and read the reply without you copying hex back and forth.
+Serial MCP is a bench terminal for serial, TCP and UDP devices. Pick a port, see every byte, send anything, and do it on Windows, macOS or Linux, including ARM boards and SSH sessions. The MCP server means an agent can open a port, send a Modbus request with the right CRC, and read the reply without you copying hex back and forth.
 
 ```
 serial-mcp            desktop GUI (falls back to the TUI when there is no display)
@@ -30,7 +30,7 @@ All front ends share one engine. A port opened in the GUI or TUI is usable by an
 | **UDP** | Local bind, default target, broadcast, echo, replies to the last sender |
 | **Discovery** | UDP broadcast probe with custom payload; lists responders with RTT; one click opens a UDP session to a device |
 | **Terminal** | Text / hex dump / decimal views, per-line timestamps and RX/TX tags, filter, follow, wrap, copy, save, 20,000-line view over a 1 MiB ring buffer |
-| **Sending** | Hercules-style escapes (`\r \n \t \xNN $0D \#013 $$`), hex mode, CR/LF/CRLF, live byte preview, history, repeat every *n* ms, send file (16 MiB), drag and drop |
+| **Sending** | Control-byte escapes (`\r \n \t \xNN $0D \#013 $$`), hex mode, CR/LF/CRLF, live byte preview, history, repeat every *n* ms, send file (16 MiB), drag and drop |
 | **Checksums** | CRC-16 Modbus / CCITT / XMODEM, CRC-32, LRC, XOR, SUM-8, appended automatically on send |
 | **Macros** | 12 macros on F1 to F12, editable in Settings, shared with the TUI and MCP |
 | **Recording** | Text log, CSV (`timestamp,direction,length,hex,text`) or raw received bytes; flushed as data arrives |
@@ -193,7 +193,7 @@ The tests cover codecs, checksums against standard check values, the auto-respon
 
 ## Limitations
 
-- HW group's proprietary UDP Config and TEA authorization are not implemented; discovery sends a configurable probe and shows raw replies.
+- UDP discovery sends a configurable probe and shows raw replies; vendor-specific discovery protocols and their authorization schemes are not implemented.
 - Mark/space parity is offered by the configuration format for compatibility but rejected by the serial backend; use none, even or odd.
 - RFC 2217 (serial over Telnet) is not implemented; Telnet support is a plain NVT terminal.
 - The HTTP MCP transport is unauthenticated.
@@ -204,4 +204,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Security reports go through [SECURITY.md
 
 ## License
 
-MIT. See [LICENSE](LICENSE). Hercules SETUP is a product of HW group s.r.o.; this is an independent implementation and is not affiliated with HW group.
+MIT. See [LICENSE](LICENSE).

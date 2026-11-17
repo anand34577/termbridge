@@ -1,8 +1,7 @@
 //! Byte formatting and input parsing.
 //!
-//! Input parsing is Hercules-compatible where practical:
-//! `\#013` (decimal), `$0d` (hex), `##`, `$$` and `<<` escapes, plus the usual
-//! `\r`, `\n`, `\t`, `\0` and `\xNN` sequences.
+//! Input parsing accepts `\#013` (decimal), `$0d` (hex), `##`, `$$` and `<<`
+//! escapes, plus the usual `\r`, `\n`, `\t`, `\0` and `\xNN` sequences.
 
 use serde::{Deserialize, Serialize};
 
@@ -87,7 +86,7 @@ pub fn parse_hex(input: &str) -> Result<Vec<u8>> {
     Ok(out)
 }
 
-/// Parse ASCII input with Hercules-style escapes.
+/// Parse ASCII input with escape sequences.
 pub fn parse_escapes(input: &str) -> Result<Vec<u8>> {
     let mut out = Vec::with_capacity(input.len());
     let chars: Vec<char> = input.chars().collect();

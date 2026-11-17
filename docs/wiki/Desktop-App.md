@@ -49,7 +49,7 @@ From top to bottom:
 | Send a firmware image or script | **Send file**, or drop the file on the window and then confirm in **Send file** (up to 16 MiB) |
 | Send a saved command | Click a macro or press F1 to F12 |
 
-Escapes in text mode: `\r` `\n` `\t` `\0` `\\`, `\xNN` for any byte, `$NN` (hex) and `\#NNN` (decimal) Hercules-style, and `$$`, `##`, `<<` for a literal `$`, `#` or `<`.
+Escapes in text mode: `\r` `\n` `\t` `\0` `\\`, `\xNN` for any byte, `$NN` (hex) and `\#NNN` (decimal), and `$$`, `##`, `<<` for a literal `$`, `#` or `<`.
 
 The grey text on the right of the composer previews the exact bytes before you send. If the input can't be parsed, it turns red and says why.
 

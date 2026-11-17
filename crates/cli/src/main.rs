@@ -24,7 +24,7 @@ use serial_mcp_mcp::McpServer;
     name = "serial-mcp",
     version,
     about = "Serial / TCP / UDP terminal with an MCP server",
-    long_about = "A cross-platform Hercules-style terminal. Run the desktop GUI, expose serial and \
+    long_about = "A cross-platform serial, TCP and UDP terminal. Run the desktop GUI, expose serial and \
 network terminals to AI agents over MCP, or use it headlessly from scripts."
 )]
 struct Cli {
