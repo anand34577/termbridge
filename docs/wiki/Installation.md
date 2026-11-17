@@ -1,33 +1,57 @@
 # Installation
 
-Termbridge is a single program file. There's no installer and nothing else to set up; you put the file somewhere and run it.
+Releases are on the [Releases page](https://github.com/anand34577/termbridge/releases).
+Each release ships three kinds of file. Pick the kind that suits you, then the
+build that matches your computer.
 
-## Which download
+- **Installer** — registers Termbridge with your system and gives you an
+  uninstaller. Best if you just want it available and kept up to date.
+- **Portable** — an archive you unpack and run. Best for a USB stick, a shared
+  machine, or anywhere you cannot install software.
+- **Bare binary** — the executable alone. Best for scripts, containers and
+  building your own image.
 
-Releases are on the [Releases page](https://github.com/anand34577/termbridge/releases). Pick the file that matches your computer:
+## Which build
 
-| Computer | File | Includes |
-| --- | --- | --- |
-| Windows PC (Intel/AMD) | `termbridge-x86_64-pc-windows-msvc` | GUI, TUI, MCP, CLI |
-| Windows on ARM (Surface Pro X, Snapdragon laptops) | `termbridge-aarch64-pc-windows-msvc` | GUI, TUI, MCP, CLI |
-| Mac with Apple Silicon (M1 to M4) | `termbridge-aarch64-apple-darwin` | GUI, TUI, MCP, CLI |
-| Intel Mac | `termbridge-x86_64-apple-darwin` | GUI, TUI, MCP, CLI |
-| Linux PC | `termbridge-x86_64-unknown-linux-gnu` | GUI, TUI, MCP, CLI |
-| Linux PC, any distro, no dependencies | `termbridge-x86_64-unknown-linux-musl` | TUI, MCP, CLI |
-| Raspberry Pi 4/5 or other 64-bit ARM board | `termbridge-aarch64-unknown-linux-gnu` | TUI, MCP, CLI |
-| Raspberry Pi 2/3 (32-bit OS) and ARMv7 boards | `termbridge-armv7-unknown-linux-gnueabihf` | TUI, MCP, CLI |
+| Computer | Target |
+| --- | --- |
+| Windows PC (Intel/AMD) | `x86_64-pc-windows-msvc` |
+| Windows on ARM (Surface Pro X, Snapdragon laptops) | `aarch64-pc-windows-msvc` |
+| Mac with Apple Silicon (M1 to M4) | `aarch64-apple-darwin` |
+| Intel Mac | `x86_64-apple-darwin` |
+| Linux PC | `x86_64-unknown-linux-gnu` |
+| Linux PC, any distro, no dependencies | `x86_64-unknown-linux-musl` |
+| Raspberry Pi 4/5 or other 64-bit ARM board | `aarch64-unknown-linux-gnu` |
+| Raspberry Pi 2/3 (32-bit OS) and ARMv7 boards | `armv7-unknown-linux-gnueabihf` |
 
-Not sure which Linux build you need? Run `uname -m`. `x86_64` means the PC builds, `aarch64` the ARM64 build, `armv7l` the ARMv7 build.
+Not sure which Linux build you need? Run `uname -m`. `x86_64` means the PC
+builds, `aarch64` the ARM64 build, `armv7l` the ARMv7 build.
+
+The `gnu` builds include the desktop GUI, the terminal UI, the MCP server and
+the headless commands. The `musl` and ARM builds are TUI, MCP and CLI only:
+they need no graphics libraries, which is what makes them usable on a minimal
+server or an older Pi.
 
 ## Windows
 
-1. Download the Windows `.tar.gz` file and open it (Windows 11 opens `.tar.gz` in Explorer; on Windows 10 use 7-Zip).
-2. Copy `termbridge-x86_64-pc-windows-msvc.exe` to a folder such as `C:\Tools\` and rename it to `termbridge.exe`.
-3. Double-click it. The desktop app opens.
+**Installer.** Download `termbridge-x86_64-pc-windows-msvc.msi` and run it.
+It installs to `Program Files\Termbridge` and registers an uninstaller in
+Apps & features.
 
-Windows SmartScreen may say the app is from an unknown publisher, because the binary isn't code-signed. Click **More info**, then **Run anyway**.
+**Portable.** Download `termbridge-x86_64-pc-windows-msvc-portable.zip` and
+extract it anywhere. Windows opens `.zip` natively; double-click
+`termbridge-x86_64-pc-windows-msvc.exe`.
 
-To run it from any terminal, add the folder to your `PATH`: Start → "Edit the system environment variables" → Environment Variables → `Path` → New → `C:\Tools`. Open a new terminal and check:
+**Bare binary.** Download `termbridge-x86_64-pc-windows-msvc.exe` and put it
+wherever you like.
+
+Windows SmartScreen says the publisher is unknown because the binaries are not
+code-signed. Click **More info**, then **Run anyway**. This applies to the
+installer and the portable build alike.
+
+To run it from any terminal, add its folder to your `PATH`: Start → "Edit the
+system environment variables" → Environment Variables → `Path` → New. Open a
+new terminal and check:
 
 ```powershell
 termbridge --version
@@ -35,57 +59,92 @@ termbridge --version
 
 You should see `termbridge 0.1.0`.
 
-Most USB-to-serial adapters (FTDI, CP210x, CH340, PL2303) install their drivers automatically through Windows Update. If the port doesn't appear in Device Manager under **Ports (COM & LPT)**, install the vendor driver.
+Most USB-to-serial adapters (FTDI, CP210x, CH340, PL2303) install their drivers
+automatically through Windows Update. If the port does not appear in Device
+Manager under **Ports (COM & LPT)**, install the vendor driver.
 
 ## macOS
 
-1. Download the file for your Mac and extract it.
-2. Move the binary into place and make it executable:
+**Installer.** Download `termbridge-aarch64-apple-darwin.dmg`, open it and drag
+**Termbridge** to Applications.
 
-   ```bash
-   sudo mv termbridge-aarch64-apple-darwin /usr/local/bin/termbridge
-   sudo chmod +x /usr/local/bin/termbridge
-   ```
+**Portable.** Download `termbridge-aarch64-apple-darwin-portable.zip` and
+extract it wherever you like.
 
-3. The first launch is blocked by Gatekeeper because the binary isn't notarized. Clear the quarantine flag once:
+**Bare binary.** Download the executable and put it on your `PATH`:
 
-   ```bash
-   xattr -d com.apple.quarantine /usr/local/bin/termbridge
-   ```
+```bash
+sudo install -m 755 termbridge-aarch64-apple-darwin /usr/local/bin/termbridge
+```
 
-4. Run `termbridge`. The desktop app opens.
+Gatekeeper blocks the first launch because the binaries are not notarized.
+Clear the quarantine flag once:
 
-On macOS, serial ports show up as `/dev/cu.usbserial-XXXX` or `/dev/cu.usbmodemXXXX`. Use the `cu.` names, not `tty.`; the `tty.` devices wait for a carrier signal and often seem to hang.
+```bash
+xattr -d com.apple.quarantine /Applications/Termbridge.app
+# or, for a bare binary:
+xattr -d com.apple.quarantine /usr/local/bin/termbridge
+```
+
+On macOS, serial ports show up as `/dev/cu.usbserial-XXXX` or
+`/dev/cu.usbmodemXXXX`. Use the `cu.` names, not `tty.`; the `tty.` devices wait
+for a carrier signal and often seem to hang.
 
 ## Linux and Raspberry Pi
 
-1. Download and install:
+**Package.** Download the `.deb` for your architecture and install it:
 
-   ```bash
-   tar -xzf termbridge-aarch64-unknown-linux-gnu.tar.gz
-   sudo install -m 755 termbridge-aarch64-unknown-linux-gnu /usr/local/bin/termbridge
-   ```
+```bash
+sudo apt install ./termbridge_0.1.0_arm64.deb
+```
 
-2. Give your user access to serial ports. On Debian, Ubuntu and Raspberry Pi OS the group is `dialout`; on Arch and Fedora it's `uucp` or `dialout`:
+That puts `termbridge` in `/usr/bin` and the licence notices in
+`/usr/share/doc/termbridge/`. Remove it with `sudo apt remove termbridge`.
 
-   ```bash
-   sudo usermod -aG dialout "$USER"
-   ```
+**Portable or bare binary.** Unpack or copy the executable into place:
 
-   Log out and back in (or reboot) for this to take effect. Check with `groups`; `dialout` should be in the list.
+```bash
+tar -xzf termbridge-aarch64-unknown-linux-gnu-portable.tar.gz
+sudo install -m 755 termbridge-aarch64-unknown-linux-gnu /usr/local/bin/termbridge
+```
 
-3. Run it:
+Then give your user access to serial ports. On Debian, Ubuntu and Raspberry Pi
+OS the group is `dialout`; on Arch and Fedora it is `uucp` or `dialout`:
 
-   ```bash
-   termbridge            # desktop app if you have a desktop session, otherwise the TUI
-   termbridge tui        # always the terminal UI
-   ```
+```bash
+sudo usermod -aG dialout "$USER"
+```
 
-The `gnu` builds need `libudev` at run time, which every desktop and server distro already has. The GUI build also loads X11 or Wayland and OpenGL when you open the GUI; without a display it simply starts the TUI. If your system has none of these (Alpine, minimal containers), use the `musl` build.
+Log out and back in (or reboot) for this to take effect. Check with `groups`;
+`dialout` should be in the list.
+
+Run it:
+
+```bash
+termbridge            # desktop app if you have a desktop session, otherwise the TUI
+termbridge tui        # always the terminal UI
+```
+
+The `gnu` builds need `libudev` at run time, which every desktop and server
+distro already has. The GUI build also loads X11 or Wayland and OpenGL when you
+open the GUI; without a display it simply starts the TUI. If your system has
+none of these (Alpine, minimal containers), use the `musl` build.
+
+## Upgrading from Serial MCP
+
+Termbridge is the same program under a new name. On first run it moves an
+existing `serial-mcp` configuration directory into place, so your recent
+connections, macros and auto-reply rules carry over. Nothing needs to be
+re-entered.
+
+The `SERIAL_MCP_CONFIG` environment variable still works alongside
+`TERMBRIDGE_CONFIG`, so an existing script or service file keeps reading the
+file it was pointed at.
 
 ## Build from source
 
-You need Rust 1.95 or newer. Check with `rustc --version`; install or update from [rustup.rs](https://rustup.rs).
+You need Rust 1.95 or newer. Check with `rustc --version`; install or update
+from [rustup.rs](https://rustup.rs).
 
 ```bash
 git clone https://github.com/anand34577/termbridge.git
@@ -93,7 +152,8 @@ cd termbridge
 cargo build --release
 ```
 
-The binary is `target/release/termbridge` (`.exe` on Windows). On Linux, install the build packages first:
+The binary is `target/release/termbridge` (`.exe` on Windows). On Linux, install
+the build packages first:
 
 ```bash
 sudo apt-get install -y build-essential pkg-config libudev-dev \

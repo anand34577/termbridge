@@ -7,7 +7,12 @@ on:
 permissions:
   contents: write
 
+env:
+  BIN: termbridge
+
 jobs:
+  # Compile one binary per target. Nothing is packaged here, so a packaging
+  # change never forces a rebuild.
   build:
     name: build (${{ matrix.target }})
     strategy:
@@ -17,33 +22,41 @@ jobs:
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             args: ""
+            gui: true
           - os: windows-latest
             target: aarch64-pc-windows-msvc
             args: ""
+            gui: true
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             args: ""
+            gui: true
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
             args: "--no-default-features --features tui"
+            gui: false
           - os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             args: "--no-default-features --features tui,udev"
+            gui: false
           - os: ubuntu-latest
             target: armv7-unknown-linux-gnueabihf
             args: "--no-default-features --features tui,udev"
+            gui: false
           - os: macos-15-intel
             target: x86_64-apple-darwin
             args: ""
+            gui: true
           - os: macos-15
             target: aarch64-apple-darwin
             args: ""
+            gui: true
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Linux GUI build dependencies
-        if: matrix.target == 'x86_64-unknown-linux-gnu'
+        if: matrix.gui && runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libudev-dev pkg-config libxkbcommon-dev libwayland-dev libx11-dev libxi-dev libgl1-mesa-dev
@@ -55,36 +68,293 @@ jobs:
           target: ${{ matrix.target }}
           args: --release ${{ matrix.args }}
 
-      - name: Package
+      - name: Collect the bare binary
         shell: bash
         run: |
           set -euo pipefail
-          BIN=termbridge
           EXT=""
-          if [[ "${{ matrix.target }}" == *windows* ]]; then
-            BIN=termbridge.exe
-            EXT=".exe"
-          fi
-          mkdir -p dist
-          cp "target/${{ matrix.target }}/release/${BIN}" "dist/termbridge-${{ matrix.target }}${EXT}"
-          cp README.md LICENSE THIRD-PARTY-NOTICES.md dist/
-          tar -czf "termbridge-${{ matrix.target }}.tar.gz" -C dist .
+          [[ "${{ matrix.target }}" == *windows* ]] && EXT=".exe"
+          mkdir -p out
+          cp "target/${{ matrix.target }}/release/${BIN}${EXT}" \
+             "out/${BIN}-${{ matrix.target }}${EXT}"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: termbridge-${{ matrix.target }}
-          path: termbridge-${{ matrix.target }}.tar.gz
+          name: bin-${{ matrix.target }}
+          path: out/*
+          if-no-files-found: error
+
+  # Portable archives: unpack and run, no installation. Zip on Windows and
+  # macOS because those open natively, tar.gz on Linux as the convention.
+  portable:
+    name: portable (${{ matrix.target }})
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: armv7-unknown-linux-gnueabihf
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+          - os: macos-15
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: bin-${{ matrix.target }}
+          path: pkg
+
+      - name: Build the portable archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp README.md LICENSE THIRD-PARTY-NOTICES.md pkg/
+          cd pkg
+          if [[ "${{ matrix.target }}" == *windows* || "${{ matrix.target }}" == *apple* ]]; then
+            # Windows Explorer and macOS Finder both open .zip without help.
+            if command -v 7z >/dev/null; then
+              7z a -tzip "../${BIN}-${{ matrix.target }}-portable.zip" . >/dev/null
+            else
+              zip -q -r "../${BIN}-${{ matrix.target }}-portable.zip" .
+            fi
+          else
+            tar -czf "../${BIN}-${{ matrix.target }}-portable.tar.gz" .
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: portable-${{ matrix.target }}
+          path: |
+            *.zip
+            *.tar.gz
+          if-no-files-found: error
+
+  # Installers: a real package that registers the program with the OS.
+  installer-windows:
+    name: installer msi (${{ matrix.target }})
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [x86_64-pc-windows-msvc, aarch64-pc-windows-msvc]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: bin-${{ matrix.target }}
+          path: pkg
+
+      - name: Install WiX
+        run: choco install wixtoolset --no-progress -y
+
+      - name: Build the MSI
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          $arch = if ("${{ matrix.target }}" -like 'aarch64*') { 'arm64' } else { 'x64' }
+          $wxs = @"
+          <?xml version="1.0" encoding="UTF-8"?>
+          <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+            <Product Id="*" Name="Termbridge" Language="1033" Version="$version"
+                     Manufacturer="Termbridge contributors" UpgradeCode="7f2c9a54-3b1e-4c8d-9a6f-2e5d81c4b730">
+              <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="$arch"/>
+              <MajorUpgrade DowngradeErrorMessage="A newer version is already installed."/>
+              <MediaTemplate EmbedCab="yes"/>
+              <Directory Id="TARGETDIR" Name="SourceDir">
+                <Directory Id="ProgramFiles64Folder">
+                  <Directory Id="INSTALLFOLDER" Name="Termbridge"/>
+                </Directory>
+              </Directory>
+              <DirectoryRef Id="INSTALLFOLDER">
+                <Component Id="MainExe" Guid="*">
+                  <File Id="TermbridgeExe" Source="pkg\${env:BIN}-${{ matrix.target }}.exe" KeyPath="yes"/>
+                </Component>
+              </DirectoryRef>
+              <Feature Id="Main" Title="Termbridge" Level="1">
+                <ComponentRef Id="MainExe"/>
+              </Feature>
+              <Property Id="ARPHELPLINK" Value="https://github.com/${{ github.repository }}"/>
+            </Product>
+          </Wix>
+          "@
+          Set-Content -Path main.wxs -Value $wxs -Encoding UTF8
+          candle.exe -nologo -out main.wixobj main.wxs
+          light.exe -nologo -out "${env:BIN}-${{ matrix.target }}.msi" main.wixobj
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-msi-${{ matrix.target }}
+          path: "*.msi"
+          if-no-files-found: error
+
+  installer-macos:
+    name: installer dmg (${{ matrix.target }})
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+          - os: macos-15
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: bin-${{ matrix.target }}
+          path: pkg
+
+      - name: Build the .app and the dmg
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP="Termbridge.app"
+          rm -rf "$APP" stage
+          mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" stage
+          cp "pkg/${BIN}-${{ matrix.target }}" "$APP/Contents/MacOS/${BIN}"
+          chmod +x "$APP/Contents/MacOS/${BIN}"
+          cat > "$APP/Contents/Info.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleName</key><string>Termbridge</string>
+            <key>CFBundleDisplayName</key><string>Termbridge</string>
+            <key>CFBundleIdentifier</key><string>dev.termbridge.app</string>
+            <key>CFBundleVersion</key><string>${GITHUB_REF_NAME#v}</string>
+            <key>CFBundleShortVersionString</key><string>${GITHUB_REF_NAME#v}</string>
+            <key>CFBundlePackageType</key><string>APPL</string>
+            <key>CFBundleExecutable</key><string>${BIN}</string>
+            <key>LSMinimumSystemVersion</key><string>11.0</string>
+            <key>NSHighResolutionCapable</key><true/>
+          </dict>
+          </plist>
+          PLIST
+          cp -R "$APP" stage/
+          ln -s /Applications stage/Applications
+          hdiutil create -volname "Termbridge" -srcfolder stage -ov -format UDZO \
+            "${BIN}-${{ matrix.target }}.dmg"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-dmg-${{ matrix.target }}
+          path: "*.dmg"
+          if-no-files-found: error
+
+  installer-linux:
+    name: installer deb (${{ matrix.target }})
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            arch: amd64
+          - target: aarch64-unknown-linux-gnu
+            arch: arm64
+          - target: armv7-unknown-linux-gnueabihf
+            arch: armhf
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: bin-${{ matrix.target }}
+          path: pkg
+
+      - name: Build the .deb
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          ROOT="${BIN}_${VERSION}_${{ matrix.arch }}"
+          mkdir -p "$ROOT/DEBIAN" "$ROOT/usr/bin" "$ROOT/usr/share/doc/${BIN}"
+          install -m 755 "pkg/${BIN}-${{ matrix.target }}" "$ROOT/usr/bin/${BIN}"
+          cp LICENSE THIRD-PARTY-NOTICES.md "$ROOT/usr/share/doc/${BIN}/"
+          cat > "$ROOT/DEBIAN/control" <<CONTROL
+          Package: ${BIN}
+          Version: ${VERSION}
+          Section: utils
+          Priority: optional
+          Architecture: ${{ matrix.arch }}
+          Maintainer: Termbridge contributors <noreply@github.com>
+          Homepage: https://github.com/${{ github.repository }}
+          Description: Serial, TCP and UDP terminal with an MCP server
+           A bench terminal for serial ports, TCP and UDP, with a desktop GUI,
+           a terminal UI and a Model Context Protocol server so agents can
+           share the same sessions.
+          CONTROL
+          dpkg-deb --build --root-owner-group "$ROOT" "${BIN}_${VERSION}_${{ matrix.arch }}.deb"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-deb-${{ matrix.target }}
+          path: "*.deb"
+          if-no-files-found: error
 
   publish:
     name: publish release
-    needs: build
+    needs: [build, portable, installer-windows, installer-macos, installer-linux]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
-          merge-multiple: true
+
+      - name: Lay the assets out flat
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          find artifacts -type f \( -name '*.zip' -o -name '*.tar.gz' -o -name '*.msi' \
+            -o -name '*.dmg' -o -name '*.deb' \) -exec cp {} release/ \;
+          # Bare executables keep their target suffix so they are identifiable.
+          find artifacts -type f \( -name "${BIN}-*" ! -name '*.zip' ! -name '*.tar.gz' \) \
+            -exec cp {} release/ \;
+          ls -l release
+
       - uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/*.tar.gz
+          files: release/*
           generate_release_notes: true
+          body: |
+            ## Which file do I want?
+
+            **Installers** register Termbridge with your system, add it to your
+            applications or package list, and give you an uninstaller.
+
+            | Platform | File |
+            | --- | --- |
+            | Windows | `termbridge-<target>.msi` |
+            | macOS | `termbridge-<target>.dmg` (drag to Applications) |
+            | Debian, Ubuntu, Raspberry Pi OS | `termbridge_<version>_<arch>.deb` |
+
+            **Portable** archives need no installation. Unpack and run.
+
+            | Platform | File |
+            | --- | --- |
+            | Windows, macOS | `termbridge-<target>-portable.zip` |
+            | Linux | `termbridge-<target>-portable.tar.gz` |
+
+            **Bare binaries** are the executables on their own, for scripts,
+            containers and packaging into your own image.
+
+            Nothing here is code-signed, so Windows SmartScreen and macOS
+            Gatekeeper will warn on first launch. See the installation guide.
