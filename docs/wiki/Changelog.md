@@ -2,6 +2,14 @@
 
 The short version of each release. Full details are in [CHANGELOG.md](https://github.com/anand34577/termbridge/blob/main/CHANGELOG.md).
 
+## 0.1.1 (17 November 2026)
+
+First published release.
+
+- Renamed from Serial MCP to Termbridge. Existing settings move over on first run
+- Installers (`.msi`, `.dmg`, `.deb`), portable archives and bare binaries for every platform
+- Licence notices for all dependencies ship with the binaries
+
 ## 0.1.0 (17 November 2026)
 
 First release.
