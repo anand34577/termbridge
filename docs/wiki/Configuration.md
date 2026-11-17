@@ -6,17 +6,17 @@ Settings live in one TOML file (a plain text settings file) shared by the deskto
 
 | OS | Path |
 | --- | --- |
-| Windows | `%APPDATA%\serial-mcp\config.toml` |
-| macOS | `~/Library/Application Support/serial-mcp/config.toml` |
-| Linux | `~/.config/serial-mcp/config.toml` |
+| Windows | `%APPDATA%\termbridge\config.toml` |
+| macOS | `~/Library/Application Support/termbridge/config.toml` |
+| Linux | `~/.config/termbridge/config.toml` |
 
 Print the exact path and the current contents:
 
 ```bash
-serial-mcp config
+termbridge config
 ```
 
-Use a different file for one run with `--config path/to/file.toml`, or for every run by setting `SERIAL_MCP_CONFIG`. Handy for keeping a separate setup per project or per bench.
+Use a different file for one run with `--config path/to/file.toml`, or for every run by setting `TERMBRIDGE_CONFIG`. Handy for keeping a separate setup per project or per bench.
 
 The file is created the first time something is saved. If it's missing or can't be parsed, defaults are used and nothing crashes.
 
@@ -56,9 +56,9 @@ The first macro is F1, the second F2, and so on up to F12. Text macros take the 
 
 | Variable | Effect |
 | --- | --- |
-| `SERIAL_MCP_CONFIG` | Path of the config file |
-| `SERIAL_MCP_COLORS` | TUI colour depth: `truecolor`, `256`, `16`, `none` |
-| `SERIAL_MCP_GLYPHS` | TUI characters: `full`, `basic`, `ascii` |
+| `TERMBRIDGE_CONFIG` | Path of the config file |
+| `TERMBRIDGE_COLORS` | TUI colour depth: `truecolor`, `256`, `16`, `none` |
+| `TERMBRIDGE_GLYPHS` | TUI characters: `full`, `basic`, `ascii` |
 | `NO_COLOR` | Any value turns TUI colours off ([no-color.org](https://no-color.org)) |
 | `RUST_LOG` | Log detail on stderr, for example `RUST_LOG=debug`. `-v` on any command does the same. |
 

@@ -17,7 +17,7 @@ The control bar now shows a pulsing **REC CSV 1.2 KiB** pill with the bytes writ
 
 Terminal UI: press Ctrl+O, Tab to choose the format, edit the path, Enter to start. Ctrl+O again stops.
 
-Headless: `serial-mcp serial COM4 --interactive --log capture.log`.
+Headless: `termbridge serial COM4 --interactive --log capture.log`.
 
 MCP: `set_logging` with `format` set to `text`, `csv` or `raw`.
 

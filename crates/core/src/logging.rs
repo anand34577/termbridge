@@ -159,7 +159,7 @@ mod tests {
 
     #[test]
     fn writes_each_format() {
-        let dir = std::env::temp_dir().join(format!("serial-mcp-log-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("termbridge-log-{}", std::process::id()));
         for format in [LogFormat::Text, LogFormat::Csv, LogFormat::Raw] {
             let path = dir.join(format!("t.{}", format.extension()));
             {

@@ -23,5 +23,5 @@ First release.
 - Headless commands: `ports`, `serial`, `tcp-client`, `tcp-server`, `udp`, `scan`, `tcp-probe`, `udp-listen`, `checksum`, `config`.
 - Release builds for Windows, macOS and Linux on x86_64, plus ARM64 and ARMv7 Linux and Windows ARM64.
 
-[Unreleased]: https://github.com/anand34577/serial-mcp/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/anand34577/serial-mcp/releases/tag/v0.1.0
+[Unreleased]: https://github.com/anand34577/termbridge/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/anand34577/termbridge/releases/tag/v0.1.0

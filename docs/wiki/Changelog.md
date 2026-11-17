@@ -1,6 +1,6 @@
 # Changelog
 
-The short version of each release. Full details are in [CHANGELOG.md](https://github.com/anand34577/serial-mcp/blob/main/CHANGELOG.md).
+The short version of each release. Full details are in [CHANGELOG.md](https://github.com/anand34577/termbridge/blob/main/CHANGELOG.md).
 
 ## 0.1.0 (17 November 2026)
 

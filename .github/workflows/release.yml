@@ -59,21 +59,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BIN=serial-mcp
+          BIN=termbridge
           EXT=""
           if [[ "${{ matrix.target }}" == *windows* ]]; then
-            BIN=serial-mcp.exe
+            BIN=termbridge.exe
             EXT=".exe"
           fi
           mkdir -p dist
-          cp "target/${{ matrix.target }}/release/${BIN}" "dist/serial-mcp-${{ matrix.target }}${EXT}"
+          cp "target/${{ matrix.target }}/release/${BIN}" "dist/termbridge-${{ matrix.target }}${EXT}"
           cp README.md LICENSE THIRD-PARTY-NOTICES.md dist/
-          tar -czf "serial-mcp-${{ matrix.target }}.tar.gz" -C dist .
+          tar -czf "termbridge-${{ matrix.target }}.tar.gz" -C dist .
 
       - uses: actions/upload-artifact@v4
         with:
-          name: serial-mcp-${{ matrix.target }}
-          path: serial-mcp-${{ matrix.target }}.tar.gz
+          name: termbridge-${{ matrix.target }}
+          path: termbridge-${{ matrix.target }}.tar.gz
 
   publish:
     name: publish release

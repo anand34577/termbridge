@@ -7,7 +7,7 @@ use eframe::egui::{
     self, Color32, CornerRadius, FontData, FontDefinitions, FontFamily, FontId, Margin, Shadow,
     Stroke, TextStyle, Visuals,
 };
-use serial_mcp_core::types::SessionKind;
+use termbridge_core::types::SessionKind;
 
 /// Named font family used for headings and emphasised labels.
 pub const STRONG: &str = "strong";

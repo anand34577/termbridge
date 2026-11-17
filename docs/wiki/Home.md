@@ -1,10 +1,10 @@
-# Serial MCP
+# Termbridge
 
-Serial MCP is a terminal for talking to devices over serial ports, TCP and UDP. It runs as a desktop app, as a terminal app over SSH, or as an MCP server that lets an AI agent (Claude, Cursor and others) open ports and exchange data with your hardware.
+Termbridge is a terminal for talking to devices over serial ports, TCP and UDP. It runs as a desktop app, as a terminal app over SSH, or as an MCP server that lets an AI agent (Claude, Cursor and others) open ports and exchange data with your hardware.
 
 It's for anyone who sits next to a device with a USB cable: firmware developers, automation and PLC engineers, people commissioning sensors, GPS and modem integrators, and students learning RS-232.
 
-![A TCP session receiving GPS data](https://raw.githubusercontent.com/anand34577/serial-mcp/main/assets/screenshot-session.png)
+![A TCP session receiving GPS data](https://raw.githubusercontent.com/anand34577/termbridge/main/assets/screenshot-session.png)
 
 ## Start here
 

@@ -1,14 +1,14 @@
 [package]
-name = "serial-mcp-gui"
+name = "termbridge-gui"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
-description = "egui desktop GUI for Serial MCP"
+description = "egui desktop GUI for Termbridge"
 
 [dependencies]
-serial-mcp-core = { workspace = true }
-serial-mcp-mcp = { workspace = true }
+termbridge-core = { workspace = true }
+termbridge-mcp = { workspace = true }
 tokio = { workspace = true }
 eframe = { workspace = true }
 serde_json = { workspace = true }

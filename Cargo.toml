@@ -13,15 +13,15 @@ version = "0.1.0"
 edition = "2021"
 rust-version = "1.95"
 license = "MIT"
-authors = ["Serial MCP contributors"]
-repository = "https://github.com/anand34577/serial-mcp"
+authors = ["Termbridge contributors"]
+repository = "https://github.com/anand34577/termbridge"
 description = "Cross-platform serial / TCP / UDP terminal with an MCP server and headless mode"
 
 [workspace.dependencies]
-serial-mcp-core = { path = "crates/core", default-features = false }
-serial-mcp-mcp = { path = "crates/mcp" }
-serial-mcp-gui = { path = "crates/gui" }
-serial-mcp-tui = { path = "crates/tui" }
+termbridge-core = { path = "crates/core", default-features = false }
+termbridge-mcp = { path = "crates/mcp" }
+termbridge-gui = { path = "crates/gui" }
+termbridge-tui = { path = "crates/tui" }
 
 tokio = { version = "1.47", features = [
     "rt-multi-thread",

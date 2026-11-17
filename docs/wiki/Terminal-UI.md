@@ -1,8 +1,8 @@
 # Terminal UI
 
-`serial-mcp tui` runs the same sessions in a terminal window. Use it over SSH, on a Raspberry Pi without a desktop, inside tmux, or from a phone with an SSH app. When you run plain `serial-mcp` on Linux without a display, you get the TUI automatically.
+`termbridge tui` runs the same sessions in a terminal window. Use it over SSH, on a Raspberry Pi without a desktop, inside tmux, or from a phone with an SSH app. When you run plain `termbridge` on Linux without a display, you get the TUI automatically.
 
-![The terminal UI](https://raw.githubusercontent.com/anand34577/serial-mcp/main/assets/screenshot-tui.png)
+![The terminal UI](https://raw.githubusercontent.com/anand34577/termbridge/main/assets/screenshot-tui.png)
 
 ## Layout
 
@@ -69,19 +69,19 @@ The TUI checks what your terminal can show and adapts:
 Override detection when it gets it wrong:
 
 ```bash
-serial-mcp tui --colors 256          # truecolor, 256, 16 or none
-serial-mcp tui --ascii               # plain ASCII borders and symbols
-serial-mcp tui --theme "High contrast"
+termbridge tui --colors 256          # truecolor, 256, 16 or none
+termbridge tui --ascii               # plain ASCII borders and symbols
+termbridge tui --theme "High contrast"
 ```
 
-The same settings work as environment variables: `SERIAL_MCP_COLORS`, `SERIAL_MCP_GLYPHS=ascii|basic|full`, `NO_COLOR=1`.
+The same settings work as environment variables: `TERMBRIDGE_COLORS`, `TERMBRIDGE_GLYPHS=ascii|basic|full`, `NO_COLOR=1`.
 
 Themes: **Midnight** (default), **Arctic**, **Ember**, **Light** (for light terminal backgrounds) and **High contrast**. Ctrl+P cycles them and the choice is saved.
 
 ## Sharing sessions with an agent
 
 ```bash
-serial-mcp tui --mcp 127.0.0.1:8765
+termbridge tui --mcp 127.0.0.1:8765
 ```
 
 Agents connecting to `http://127.0.0.1:8765/mcp` see and use the same sessions, and anything they open appears in the TUI. See [MCP Server](MCP-Server).

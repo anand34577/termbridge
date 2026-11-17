@@ -4,16 +4,16 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use eframe::egui::{self, RichText};
-use serial_mcp_core::codec;
-use serial_mcp_core::config::{AppConfig, MacroDef, Theme, MAX_BUFFER, MIN_BUFFER};
-use serial_mcp_core::discovery::{ScanRequest, ScanResponse};
-use serial_mcp_core::session::SessionConfig;
-use serial_mcp_core::UdpConfig;
-use serial_mcp_mcp::McpServer;
+use termbridge_core::codec;
+use termbridge_core::config::{AppConfig, MacroDef, Theme, MAX_BUFFER, MIN_BUFFER};
+use termbridge_core::discovery::{ScanRequest, ScanResponse};
+use termbridge_core::session::SessionConfig;
+use termbridge_core::UdpConfig;
+use termbridge_mcp::McpServer;
 
 use crate::widgets::{self, strong_font};
 use crate::App;
-use serial_mcp_core::validate;
+use termbridge_core::validate;
 
 // ---------------------------------------------------------------- discovery
 
@@ -240,7 +240,7 @@ impl App {
         };
         let (tx, rx) = std::sync::mpsc::channel();
         self.rt.spawn(async move {
-            let result = serial_mcp_core::discovery::udp_scan(request)
+            let result = termbridge_core::discovery::udp_scan(request)
                 .await
                 .map_err(|err| err.to_string());
             let _ = tx.send(result);
@@ -434,7 +434,7 @@ impl App {
             let shutdown = async {
                 let _ = rx.await;
             };
-            if let Err(err) = serial_mcp_mcp::serve_http_listener(server, listener, shutdown).await
+            if let Err(err) = termbridge_mcp::serve_http_listener(server, listener, shutdown).await
             {
                 tracing::error!("MCP HTTP server stopped: {err}");
             }
@@ -469,17 +469,17 @@ impl App {
         let mut stop = false;
         let exe = std::env::current_exe()
             .map(|path| path.display().to_string())
-            .unwrap_or_else(|_| "serial-mcp".to_string());
+            .unwrap_or_else(|_| "termbridge".to_string());
         let stdio = serde_json::to_string_pretty(&serde_json::json!({
-            "mcpServers": { "serial-mcp": { "command": exe, "args": ["mcp", "--transport", "stdio"] } }
+            "mcpServers": { "termbridge": { "command": exe, "args": ["mcp", "--transport", "stdio"] } }
         }))
         .unwrap_or_default();
         let http = serde_json::to_string_pretty(&serde_json::json!({
-            "mcpServers": { "serial-mcp": { "type": "http", "url": format!("http://{}/mcp", self.mcp.bind.trim()) } }
+            "mcpServers": { "termbridge": { "type": "http", "url": format!("http://{}/mcp", self.mcp.bind.trim()) } }
         }))
         .unwrap_or_default();
-        let claude_cmd = format!("claude mcp add serial-mcp -- \"{exe}\" mcp --transport stdio");
-        let tools = serial_mcp_mcp::tools::definitions();
+        let claude_cmd = format!("claude mcp add termbridge -- \"{exe}\" mcp --transport stdio");
+        let tools = termbridge_mcp::tools::definitions();
 
         page(ui, 980.0, |ui, width| {
             page_header(
@@ -853,7 +853,7 @@ impl App {
                 ui.add_space(4.0);
                 form_row(ui, &p, "Version", |ui| {
                     ui.label(format!(
-                        "Serial MCP {}  ·  {} {}",
+                        "Termbridge {}  ·  {} {}",
                         env!("CARGO_PKG_VERSION"),
                         std::env::consts::OS,
                         std::env::consts::ARCH
@@ -960,7 +960,7 @@ fn decode_tool_input(input: &str, kind: InputKind) -> Result<Vec<u8>, String> {
 impl App {
     pub(crate) fn tools_page(&mut self, ui: &mut egui::Ui) {
         use base64::Engine;
-        use serial_mcp_core::checksum::{self, ChecksumKind};
+        use termbridge_core::checksum::{self, ChecksumKind};
         let p = self.palette;
         let decoded = decode_tool_input(&self.tools.input, self.tools.kind);
         let mut copied: Option<String> = None;

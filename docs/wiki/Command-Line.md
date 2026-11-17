@@ -5,7 +5,7 @@ Every transport also works without any interface, for scripts, CI jobs and quick
 ## List ports
 
 ```bash
-serial-mcp ports
+termbridge ports
 ```
 
 ```
@@ -19,19 +19,19 @@ PORT                     KIND     VID:PID    DESCRIPTION
 Send one command and print what comes back within a second:
 
 ```bash
-serial-mcp serial /dev/ttyUSB0 --baud 115200 --send "AT+GMR" --eol crlf --read-ms 1000
+termbridge serial /dev/ttyUSB0 --baud 115200 --send "AT+GMR" --eol crlf --read-ms 1000
 ```
 
 Send hex (a Modbus request with its CRC) and show the reply as hex:
 
 ```bash
-serial-mcp serial COM4 --baud 9600 --parity even --send "01 03 00 00 00 0A C5 CD" --hex --format hex
+termbridge serial COM4 --baud 9600 --parity even --send "01 03 00 00 00 0A C5 CD" --hex --format hex
 ```
 
 Interactive terminal, logging everything:
 
 ```bash
-serial-mcp serial COM4 --baud 9600 --interactive --log bench.log
+termbridge serial COM4 --baud 9600 --interactive --log bench.log
 ```
 
 | Option | Default | Meaning |
@@ -53,13 +53,13 @@ serial-mcp serial COM4 --baud 9600 --interactive --log bench.log
 ## TCP and UDP
 
 ```bash
-serial-mcp tcp-client 192.168.10.40 4001 --send "status" --eol cr
-serial-mcp tcp-client 10.20.0.15 23 --nvt --interactive
-serial-mcp tcp-server 9000 --echo --duration 60
-serial-mcp udp --local-port 5005 --remote 192.168.10.255:5005 --broadcast --send "WHO"
-serial-mcp scan --port 30718 --payload-hex "00 00 00 F8" --timeout-ms 1500
-serial-mcp tcp-probe 192.168.10.40 4001
-serial-mcp udp-listen 4000 --timeout-ms 5000
+termbridge tcp-client 192.168.10.40 4001 --send "status" --eol cr
+termbridge tcp-client 10.20.0.15 23 --nvt --interactive
+termbridge tcp-server 9000 --echo --duration 60
+termbridge udp --local-port 5005 --remote 192.168.10.255:5005 --broadcast --send "WHO"
+termbridge scan --port 30718 --payload-hex "00 00 00 F8" --timeout-ms 1500
+termbridge tcp-probe 192.168.10.40 4001
+termbridge udp-listen 4000 --timeout-ms 5000
 ```
 
 `tcp-server` runs until Ctrl+C unless `--duration` is set. `scan` sends one probe and lists every responder. `tcp-probe` measures connect latency and prints an optional banner; `udp-listen` collects unsolicited datagrams.
@@ -67,8 +67,8 @@ serial-mcp udp-listen 4000 --timeout-ms 5000
 ## Checksums
 
 ```bash
-serial-mcp checksum "01 03 00 00 00 0A" --hex --algorithm crc16_modbus
-serial-mcp checksum "AT+GMR\r" --algorithm all
+termbridge checksum "01 03 00 00 00 0A" --hex --algorithm crc16_modbus
+termbridge checksum "AT+GMR\r" --algorithm all
 ```
 
 `--algorithm` accepts `crc16_modbus`, `crc16_ccitt`, `crc16_xmodem`, `crc32`, `lrc`, `xor8`, `sum8`, or `all` (the default). The output shows the checksum bytes in append order plus the complete frame.
@@ -97,10 +97,10 @@ On stdout you get one `session <id>: <label>` line followed by the received data
 
 | Command | Does |
 | --- | --- |
-| `serial-mcp gui` | Desktop app |
-| `serial-mcp tui` | Terminal UI, see [Terminal UI](Terminal-UI) |
-| `serial-mcp mcp` | MCP server, see [MCP Server](MCP-Server) |
-| `serial-mcp tcp-probe HOST PORT` | Connect latency and optional banner |
-| `serial-mcp udp-listen PORT` | Collect unsolicited UDP datagrams |
-| `serial-mcp checksum DATA` | CRC-16/32, LRC, XOR and SUM-8 |
-| `serial-mcp config` | Config path, contents and an MCP client snippet |
+| `termbridge gui` | Desktop app |
+| `termbridge tui` | Terminal UI, see [Terminal UI](Terminal-UI) |
+| `termbridge mcp` | MCP server, see [MCP Server](MCP-Server) |
+| `termbridge tcp-probe HOST PORT` | Connect latency and optional banner |
+| `termbridge udp-listen PORT` | Collect unsolicited UDP datagrams |
+| `termbridge checksum DATA` | CRC-16/32, LRC, XOR and SUM-8 |
+| `termbridge config` | Config path, contents and an MCP client snippet |

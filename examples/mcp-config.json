@@ -1,7 +1,7 @@
 {
   "mcpServers": {
-    "serial-mcp": {
-      "command": "serial-mcp",
+    "termbridge": {
+      "command": "termbridge",
       "args": ["mcp", "--transport", "stdio"]
     }
   }

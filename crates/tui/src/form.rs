@@ -1,10 +1,10 @@
 //! Keyboard-driven "New connection" form for the TUI.
 
-use serial_mcp_core::net::PortInfo;
-use serial_mcp_core::session::{FlowControl, Parity, SessionConfig};
-use serial_mcp_core::types::SessionKind;
-use serial_mcp_core::validate::{self, Report};
-use serial_mcp_core::{SerialConfig, SessionInfo, TcpClientConfig, TcpServerConfig, UdpConfig};
+use termbridge_core::net::PortInfo;
+use termbridge_core::session::{FlowControl, Parity, SessionConfig};
+use termbridge_core::types::SessionKind;
+use termbridge_core::validate::{self, Report};
+use termbridge_core::{SerialConfig, SessionInfo, TcpClientConfig, TcpServerConfig, UdpConfig};
 
 pub const BAUD_RATES: &[u32] = &[
     300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600, 1_000_000,

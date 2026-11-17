@@ -1,21 +1,21 @@
-<img alt="Serial MCP: serial, TCP and UDP terminal with a GUI, a TUI and an MCP server" src="assets/banner.png" width="100%">
+<img alt="Termbridge: serial, TCP and UDP terminal with a GUI, a TUI and an MCP server" src="assets/banner.png" width="100%">
 
-Serial MCP is a serial, TCP and UDP terminal for people who work with devices: PLCs, GPS receivers, modems, sensors, embedded boards. It ships as one Rust binary with a desktop GUI, a terminal UI and a Model Context Protocol server, so you and an AI agent can work on the same port at the same time.
+Termbridge is a serial, TCP and UDP terminal for people who work with devices: PLCs, GPS receivers, modems, sensors, embedded boards. It ships as one Rust binary with a desktop GUI, a terminal UI and a Model Context Protocol server, so you and an AI agent can work on the same port at the same time.
 
-[![CI](https://github.com/anand34577/serial-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/anand34577/serial-mcp/actions/workflows/ci.yml)
+[![CI](https://github.com/anand34577/termbridge/actions/workflows/ci.yml/badge.svg)](https://github.com/anand34577/termbridge/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ![A TCP session receiving NMEA sentences from a GPS receiver, with recording and auto-reply active](assets/screenshot-session.png)
 
 ## Why
 
-Serial MCP is a bench terminal for serial, TCP and UDP devices. Pick a port, see every byte, send anything, and do it on Windows, macOS or Linux, including ARM boards and SSH sessions. The MCP server means an agent can open a port, send a Modbus request with the right CRC, and read the reply without you copying hex back and forth.
+Termbridge is a bench terminal for serial, TCP and UDP devices. Pick a port, see every byte, send anything, and do it on Windows, macOS or Linux, including ARM boards and SSH sessions. The MCP server means an agent can open a port, send a Modbus request with the right CRC, and read the reply without you copying hex back and forth.
 
 ```
-serial-mcp            desktop GUI (falls back to the TUI when there is no display)
-serial-mcp tui        terminal UI: SSH, Raspberry Pi, headless servers, mouse and touch
-serial-mcp mcp        MCP server over stdio or HTTP for Claude, Cursor and other agents
-serial-mcp serial …   scriptable one-shot and interactive terminals
+termbridge            desktop GUI (falls back to the TUI when there is no display)
+termbridge tui        terminal UI: SSH, Raspberry Pi, headless servers, mouse and touch
+termbridge mcp        MCP server over stdio or HTTP for Claude, Cursor and other agents
+termbridge serial …   scriptable one-shot and interactive terminals
 ```
 
 All front ends share one engine. A port opened in the GUI or TUI is usable by an agent over MCP, and sessions an agent opens appear in the GUI and TUI.
@@ -59,13 +59,13 @@ Shortcuts: Ctrl+N new connection, Enter send, Up/Down history, F1 to F12 macros,
 ![The terminal UI showing NMEA traffic and an auto-reply to a PMTK query](assets/screenshot-tui.png)
 
 ```bash
-serial-mcp tui                          # detect colours and glyphs
-serial-mcp tui --mcp 127.0.0.1:8765     # let agents share the TUI's sessions
-serial-mcp tui --theme Arctic           # Midnight, Arctic, Ember, Light, "High contrast"
-serial-mcp tui --colors 16 --ascii      # old consoles, serial terminals, Linux VT
+termbridge tui                          # detect colours and glyphs
+termbridge tui --mcp 127.0.0.1:8765     # let agents share the TUI's sessions
+termbridge tui --theme Arctic           # Midnight, Arctic, Ember, Light, "High contrast"
+termbridge tui --colors 16 --ascii      # old consoles, serial terminals, Linux VT
 ```
 
-- **Any terminal:** truecolor, 256-colour, 16-colour and monochrome (`NO_COLOR`) are detected and every theme is adapted to them. Linux VT and non-UTF-8 locales get ASCII borders and glyphs. Override with `--colors`, `--ascii`, `SERIAL_MCP_COLORS` or `SERIAL_MCP_GLYPHS`.
+- **Any terminal:** truecolor, 256-colour, 16-colour and monochrome (`NO_COLOR`) are detected and every theme is adapted to them. Linux VT and non-UTF-8 locales get ASCII borders and glyphs. Override with `--colors`, `--ascii`, `TERMBRIDGE_COLORS` or `TERMBRIDGE_GLYPHS`.
 - **Mouse and touch:** tap sessions, recent connections, dialog fields, choices and buttons, and the shortcut hints in the footer; scroll or swipe the terminal and lists. This works in Windows Terminal, iTerm2, GNOME Terminal, Kitty, tmux, and Termux / JuiceSSH / Blink on phones. Hold Shift while dragging to select text.
 - **Animations:** RX/TX activity lights, a live throughput sparkline, a spinner while connecting, and a blinking REC indicator.
 - Validated New connection form (Ctrl+N), recording (Ctrl+O), hex input (Ctrl+X), line endings (Ctrl+E), checksums (Ctrl+K), views (Ctrl+F), themes (Ctrl+P), RTS/DTR (Ctrl+R / Ctrl+D), macros (F1 to F12), send file (Ctrl+S), help (Ctrl+G).
@@ -73,17 +73,17 @@ serial-mcp tui --colors 16 --ascii      # old consoles, serial terminals, Linux 
 ## Headless CLI
 
 ```bash
-serial-mcp ports
-serial-mcp serial COM3 --baud 115200 --send "AT\r" --read-ms 1000
-serial-mcp serial /dev/ttyUSB0 --baud 9600 --interactive
-serial-mcp tcp-client 192.168.1.50 23 --nvt --interactive
-serial-mcp tcp-server 9000 --echo
-serial-mcp udp --local-port 4000 --remote 192.168.1.50:4000 --send "PING\r\n"
-serial-mcp scan --port 4000 --payload-hex 00 --timeout-ms 1500
-serial-mcp tcp-probe 192.168.1.50 23
-serial-mcp udp-listen 4000 --timeout-ms 5000
-serial-mcp checksum "01 03 00 00 00 0A" --hex --algorithm crc16_modbus
-serial-mcp config        # config path and a ready-to-paste MCP client snippet
+termbridge ports
+termbridge serial COM3 --baud 115200 --send "AT\r" --read-ms 1000
+termbridge serial /dev/ttyUSB0 --baud 9600 --interactive
+termbridge tcp-client 192.168.1.50 23 --nvt --interactive
+termbridge tcp-server 9000 --echo
+termbridge udp --local-port 4000 --remote 192.168.1.50:4000 --send "PING\r\n"
+termbridge scan --port 4000 --payload-hex 00 --timeout-ms 1500
+termbridge tcp-probe 192.168.1.50 23
+termbridge udp-listen 4000 --timeout-ms 5000
+termbridge checksum "01 03 00 00 00 0A" --hex --algorithm crc16_modbus
+termbridge config        # config path and a ready-to-paste MCP client snippet
 ```
 
 Interactive commands: `/help`, `/hex on|off`, `/format ascii|hex|dec`, `/eol none|cr|lf|crlf`, `/rts on|off`, `/dtr on|off`, `/break on|off`, `/log PATH`, `/quit`.
@@ -91,9 +91,9 @@ Interactive commands: `/help`, `/hex on|off`, `/format ascii|hex|dec`, `/eol non
 ## MCP server
 
 ```bash
-serial-mcp mcp --transport stdio
-serial-mcp mcp --transport http --bind 127.0.0.1:8765     # POST /mcp, GET /health
-claude mcp add serial-mcp -- /path/to/serial-mcp mcp --transport stdio
+termbridge mcp --transport stdio
+termbridge mcp --transport http --bind 127.0.0.1:8765     # POST /mcp, GET /health
+claude mcp add termbridge -- /path/to/termbridge mcp --transport stdio
 ```
 
 Claude Desktop / Cursor:
@@ -101,7 +101,7 @@ Claude Desktop / Cursor:
 ```json
 {
   "mcpServers": {
-    "serial-mcp": { "command": "C:\\path\\to\\serial-mcp.exe", "args": ["mcp", "--transport", "stdio"] }
+    "termbridge": { "command": "C:\\path\\to\\termbridge.exe", "args": ["mcp", "--transport", "stdio"] }
   }
 }
 ```
@@ -123,18 +123,18 @@ The GUI's **MCP server** page starts the HTTP endpoint inside the app (optionall
 | `udp_scan`, `udp_listen`, `tcp_probe` | Network discovery |
 | `get_server_info` | Version, platform, uptime |
 
-Resources: `serial-mcp://info`, `serial-mcp://ports`, `serial-mcp://sessions`, `serial-mcp://sessions/{id}/status`, `serial-mcp://sessions/{id}/log`. Prompts: `diagnose_serial_link`, `echo_test`. See [docs/MCP.md](docs/MCP.md) for request examples.
+Resources: `termbridge://info`, `termbridge://ports`, `termbridge://sessions`, `termbridge://sessions/{id}/status`, `termbridge://sessions/{id}/log`. Prompts: `diagnose_serial_link`, `echo_test`. See [docs/MCP.md](docs/MCP.md) for request examples.
 
 The HTTP transport has **no authentication**. It binds to localhost by default and the GUI warns when you choose another address.
 
 ## Documentation
 
-The [wiki](https://github.com/anand34577/serial-mcp/wiki) covers installation per OS, a first-session walkthrough, every setting, recording and auto-reply, MCP setup for different clients, and troubleshooting. Its source lives in [`docs/wiki/`](docs/wiki/).
+The [wiki](https://github.com/anand34577/termbridge/wiki) covers installation per OS, a first-session walkthrough, every setting, recording and auto-reply, MCP setup for different clients, and troubleshooting. Its source lives in [`docs/wiki/`](docs/wiki/).
 
 ## Install and build
 
 ```bash
-cargo build --release              # GUI + TUI + MCP + CLI in target/release/serial-mcp
+cargo build --release              # GUI + TUI + MCP + CLI in target/release/termbridge
 cargo install --path crates/cli --locked
 ```
 
@@ -170,7 +170,7 @@ Tagged pushes (`v*`) build all of these in GitHub Actions ([release.yml](.github
 
 ## Configuration
 
-`%APPDATA%\serial-mcp\config.toml` on Windows, `~/Library/Application Support/serial-mcp/config.toml` on macOS, `~/.config/serial-mcp/config.toml` on Linux. Override with `--config FILE` or `SERIAL_MCP_CONFIG`. It stores theme, TUI theme, timestamps, buffer size, log folder, macros, MCP bind/autostart and recent connections. Saves are atomic; out-of-range values are clamped on load.
+`%APPDATA%\termbridge\config.toml` on Windows, `~/Library/Application Support/termbridge/config.toml` on macOS, `~/.config/termbridge/config.toml` on Linux. Override with `--config FILE` or `TERMBRIDGE_CONFIG`. It stores theme, TUI theme, timestamps, buffer size, log folder, macros, MCP bind/autostart and recent connections. Saves are atomic; out-of-range values are clamped on load.
 
 ## Architecture
 
@@ -180,7 +180,7 @@ Tagged pushes (`v*`) build all of these in GitHub Actions ([release.yml](.github
 | `crates/mcp` | JSON-RPC/MCP protocol, tools, resources, prompts, stdio and HTTP transports |
 | `crates/gui` | egui/eframe desktop app |
 | `crates/tui` | ratatui/crossterm terminal app |
-| `crates/cli` | The `serial-mcp` binary: picks GUI or TUI, runs MCP and headless commands |
+| `crates/cli` | The `termbridge` binary: picks GUI or TUI, runs MCP and headless commands |
 
 ## Tests
 

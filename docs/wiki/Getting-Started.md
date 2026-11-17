@@ -9,7 +9,7 @@ Connect your USB-to-serial adapter or board. On Windows it shows up as a `COM` p
 You can list ports from a terminal:
 
 ```bash
-serial-mcp ports
+termbridge ports
 ```
 
 You should see something like:
@@ -21,7 +21,7 @@ COM4                     usb      0403:6001  FT232R USB UART
 
 ## 2. Open the app
 
-Run `serial-mcp` (or double-click it on Windows). You'll see the **Start a session** screen with four cards: Serial port, TCP client, TCP server and UDP.
+Run `termbridge` (or double-click it on Windows). You'll see the **Start a session** screen with four cards: Serial port, TCP client, TCP server and UDP.
 
 ## 3. Configure the port
 

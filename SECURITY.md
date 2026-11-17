@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Please report security problems privately through [GitHub security advisories](https://github.com/anand34577/serial-mcp/security/advisories/new), not in a public issue. Include the version (`serial-mcp --version`), your platform, and steps to reproduce. You'll get a reply within a week.
+Please report security problems privately through [GitHub security advisories](https://github.com/anand34577/termbridge/security/advisories/new), not in a public issue. Include the version (`termbridge --version`), your platform, and steps to reproduce. You'll get a reply within a week.
 
 ## What to keep in mind when running it
 
