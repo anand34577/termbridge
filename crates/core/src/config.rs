@@ -149,6 +149,13 @@ impl ConfigStore {
         let path = path
             .map(|p| p.to_path_buf())
             .unwrap_or_else(default_config_path);
+        // Only migrate when we are using the default location; an explicit path
+        // means the caller owns the file.
+        if path.ends_with("termbridge/config.toml") {
+            if let Some(dir) = path.parent() {
+                migrate_legacy_config_dir(dir);
+            }
+        }
         let mut config = match std::fs::read_to_string(&path) {
             Ok(text) => toml::from_str::<AppConfig>(&text).unwrap_or_else(|err| {
                 tracing::warn!("invalid config at {}: {err}", path.display());
@@ -197,11 +204,65 @@ impl ConfigStore {
 }
 
 pub fn default_config_path() -> PathBuf {
+    if let Ok(path) = std::env::var("TERMBRIDGE_CONFIG") {
+        return PathBuf::from(path);
+    }
+    // The variable was named after the old binary. Keep honouring it so an
+    // existing setup does not silently start reading a different file.
     if let Ok(path) = std::env::var("SERIAL_MCP_CONFIG") {
         return PathBuf::from(path);
     }
     let base = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
-    base.join("serial-mcp").join("config.toml")
+    base.join("termbridge").join("config.toml")
+}
+
+/// Directory this program used before it was renamed.
+fn legacy_config_dir() -> Option<PathBuf> {
+    dirs::config_dir().map(|base| base.join("serial-mcp"))
+}
+
+/// Move a config directory left by the previous name into place.
+///
+/// Runs once, before the first load. The old directory is renamed rather than
+/// copied, so a user's recent connections, macros and auto-reply rules carry
+/// over without leaving two configs that can drift apart. If the new
+/// directory already exists the old one is left untouched.
+fn migrate_legacy_config_dir(new_dir: &Path) {
+    if new_dir.exists() {
+        return;
+    }
+    let Some(old_dir) = legacy_config_dir() else {
+        return;
+    };
+    move_config_dir(&old_dir, new_dir);
+}
+
+/// Rename `old_dir` to `new_dir`, falling back to a copy when the rename
+/// cannot cross filesystems. Does nothing if `old_dir` is absent.
+fn move_config_dir(old_dir: &Path, new_dir: &Path) {
+    if !old_dir.is_dir() {
+        return;
+    }
+    if let Some(parent) = new_dir.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    match std::fs::rename(old_dir, new_dir) {
+        Ok(()) => tracing::info!(
+            "moved configuration from {} to {}",
+            old_dir.display(),
+            new_dir.display()
+        ),
+        // A rename can fail across filesystems; copying keeps the settings.
+        Err(_) => {
+            let _ = std::fs::create_dir_all(new_dir);
+            if let Ok(entries) = std::fs::read_dir(old_dir) {
+                for entry in entries.flatten() {
+                    let dest = new_dir.join(entry.file_name());
+                    let _ = std::fs::copy(entry.path(), &dest);
+                }
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -210,7 +271,7 @@ mod tests {
 
     #[test]
     fn round_trips_config() {
-        let dir = std::env::temp_dir().join(format!("serial-mcp-test-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("termbridge-test-{}", std::process::id()));
         let path = dir.join("config.toml");
         let store = ConfigStore::load(Some(&path));
         store.update(|cfg| {
@@ -236,12 +297,52 @@ mod tests {
             }));
         }
         assert_eq!(cfg.recent.len(), 2);
-        let dir = std::env::temp_dir().join(format!("serial-mcp-recent-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("termbridge-recent-{}", std::process::id()));
         let path = dir.join("config.toml");
         let store = ConfigStore::load(Some(&path));
         store.update(|c| *c = cfg.clone());
         store.save().unwrap();
         assert_eq!(ConfigStore::load(Some(&path)).get().recent.len(), 2);
         let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn moves_config_from_the_old_directory() {
+        let base = std::env::temp_dir().join(format!("termbridge-move-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&base);
+        let old = base.join("serial-mcp");
+        let new = base.join("termbridge");
+        std::fs::create_dir_all(&old).unwrap();
+        std::fs::write(old.join("config.toml"), "show_timestamps = false\n").unwrap();
+
+        move_config_dir(&old, &new);
+
+        assert!(new.join("config.toml").exists(), "config did not move");
+        assert!(!old.exists(), "old directory was left behind");
+        let cfg = ConfigStore::load(Some(&new.join("config.toml"))).get();
+        assert!(!cfg.show_timestamps, "settings were not preserved");
+        let _ = std::fs::remove_dir_all(base);
+    }
+
+    #[test]
+    fn leaves_an_existing_config_directory_alone() {
+        let base = std::env::temp_dir().join(format!("termbridge-keep-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&base);
+        let old = base.join("serial-mcp");
+        let new = base.join("termbridge");
+        std::fs::create_dir_all(&old).unwrap();
+        std::fs::create_dir_all(&new).unwrap();
+        std::fs::write(new.join("config.toml"), "show_timestamps = true\n").unwrap();
+
+        move_config_dir(&old, &new);
+
+        assert!(old.exists(), "the old directory should be untouched");
+        assert!(
+            ConfigStore::load(Some(&new.join("config.toml")))
+                .get()
+                .show_timestamps,
+            "the existing config should not be overwritten"
+        );
+        let _ = std::fs::remove_dir_all(base);
     }
 }

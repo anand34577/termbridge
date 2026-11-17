@@ -1,13 +1,13 @@
 # MCP reference
 
-Serial MCP implements MCP protocol revisions `2024-11-05`, `2025-03-26` and `2025-06-18` over two transports:
+Termbridge implements MCP protocol revisions `2024-11-05`, `2025-03-26` and `2025-06-18` over two transports:
 
 - **stdio**: newline-delimited JSON-RPC on stdin/stdout, logs on stderr.
 - **HTTP**: `POST /mcp` with JSON-RPC bodies, `GET /health`, CORS enabled, no authentication.
 
 ```bash
-serial-mcp mcp --transport stdio
-serial-mcp mcp --transport http --bind 127.0.0.1:8765
+termbridge mcp --transport stdio
+termbridge mcp --transport http --bind 127.0.0.1:8765
 ```
 
 ## Typical agent workflow
@@ -179,11 +179,11 @@ Optional `checksum`: `crc16_modbus`, `crc16_ccitt`, `crc16_xmodem`, `crc32`, `lr
 
 | URI | Content |
 | --- | --- |
-| `serial-mcp://info` | Version, platform, config path, uptime |
-| `serial-mcp://ports` | Current serial port list |
-| `serial-mcp://sessions` | All sessions |
-| `serial-mcp://sessions/{id}/status` | One session's status |
-| `serial-mcp://sessions/{id}/log` | Last 64 KiB of traffic |
+| `termbridge://info` | Version, platform, config path, uptime |
+| `termbridge://ports` | Current serial port list |
+| `termbridge://sessions` | All sessions |
+| `termbridge://sessions/{id}/status` | One session's status |
+| `termbridge://sessions/{id}/log` | Last 64 KiB of traffic |
 
 ## Prompts
 

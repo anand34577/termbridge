@@ -3265,79 +3265,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serial-mcp"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "serde_json",
- "serial-mcp-core",
- "serial-mcp-gui",
- "serial-mcp-mcp",
- "serial-mcp-tui",
- "tokio",
- "toml",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "serial-mcp-core"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "dirs",
- "serde",
- "serialport",
- "thiserror 2.0.21",
- "tokio",
- "toml",
- "tracing",
-]
-
-[[package]]
-name = "serial-mcp-gui"
-version = "0.1.0"
-dependencies = [
- "base64",
- "chrono",
- "eframe",
- "serde_json",
- "serial-mcp-core",
- "serial-mcp-mcp",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "serial-mcp-mcp"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "axum",
- "base64",
- "bytes",
- "serde",
- "serde_json",
- "serial-mcp-core",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "serial-mcp-tui"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "chrono",
- "ratatui",
- "serial-mcp-core",
- "serial-mcp-mcp",
- "tokio",
- "tracing",
-]
-
-[[package]]
 name = "serialport"
 version = "4.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3600,6 +3527,79 @@ name = "sync_wrapper"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0bf256ce5efdfa370213c1dabab5935a12e49f2c58d15e9eac2870d3b4f27263"
+
+[[package]]
+name = "termbridge"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "serde_json",
+ "termbridge-core",
+ "termbridge-gui",
+ "termbridge-mcp",
+ "termbridge-tui",
+ "tokio",
+ "toml",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "termbridge-core"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "dirs",
+ "serde",
+ "serialport",
+ "thiserror 2.0.21",
+ "tokio",
+ "toml",
+ "tracing",
+]
+
+[[package]]
+name = "termbridge-gui"
+version = "0.1.0"
+dependencies = [
+ "base64",
+ "chrono",
+ "eframe",
+ "serde_json",
+ "termbridge-core",
+ "termbridge-mcp",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "termbridge-mcp"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "base64",
+ "bytes",
+ "serde",
+ "serde_json",
+ "termbridge-core",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "termbridge-tui"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "ratatui",
+ "termbridge-core",
+ "termbridge-mcp",
+ "tokio",
+ "tracing",
+]
 
 [[package]]
 name = "termina"

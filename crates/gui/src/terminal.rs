@@ -1,8 +1,8 @@
-//! Terminal renderer for the GUI. The line model lives in `serial_mcp_core::view`.
+//! Terminal renderer for the GUI. The line model lives in `termbridge_core::view`.
 
 use eframe::egui::{self, CornerRadius, Margin, RichText, Stroke, Vec2};
-use serial_mcp_core::types::Direction;
-pub use serial_mcp_core::view::{dir_tag, LineFilter, TermLine, TerminalBuffer};
+use termbridge_core::types::Direction;
+pub use termbridge_core::view::{dir_tag, LineFilter, TermLine, TerminalBuffer};
 
 use crate::theme::Palette;
 use crate::widgets::strong_font;

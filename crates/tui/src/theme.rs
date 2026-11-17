@@ -51,7 +51,7 @@ pub enum GlyphLevel {
 /// Detect the colour depth from the environment.
 pub fn detect_depth() -> Depth {
     let var = |k: &str| std::env::var(k).unwrap_or_default().to_ascii_lowercase();
-    if let Some(d) = Depth::parse(&var("SERIAL_MCP_COLORS")) {
+    if let Some(d) = Depth::parse(&var("TERMBRIDGE_COLORS")) {
         return d;
     }
     if std::env::var_os("NO_COLOR").is_some_and(|v| !v.is_empty()) {
@@ -105,7 +105,7 @@ pub fn detect_depth() -> Depth {
 /// Detect how rich the glyph set may be.
 pub fn detect_glyphs() -> GlyphLevel {
     let var = |k: &str| std::env::var(k).unwrap_or_default().to_ascii_lowercase();
-    match var("SERIAL_MCP_GLYPHS").as_str() {
+    match var("TERMBRIDGE_GLYPHS").as_str() {
         "ascii" => return GlyphLevel::Ascii,
         "basic" => return GlyphLevel::Basic,
         "full" | "unicode" => return GlyphLevel::Full,

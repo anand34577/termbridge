@@ -1,4 +1,4 @@
-//! egui desktop GUI for Serial MCP.
+//! egui desktop GUI for Termbridge.
 
 mod forms;
 mod pages;
@@ -11,12 +11,12 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use eframe::egui::{self, Color32, CornerRadius, Margin, RichText, Stroke, Vec2};
-use serial_mcp_core::config::{recent_key, ConfigStore};
-use serial_mcp_core::net;
-use serial_mcp_core::session::SessionConfig;
-use serial_mcp_core::types::{SessionEvent, SessionKind};
-use serial_mcp_core::validate;
-use serial_mcp_core::SessionManager;
+use termbridge_core::config::{recent_key, ConfigStore};
+use termbridge_core::net;
+use termbridge_core::session::SessionConfig;
+use termbridge_core::types::{SessionEvent, SessionKind};
+use termbridge_core::validate;
+use termbridge_core::SessionManager;
 
 use forms::{kind_short, ConnectForms, FormResult};
 use session::SessionView;
@@ -29,13 +29,13 @@ pub fn run(config: Arc<ConfigStore>) -> eframe::Result<()> {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([1320.0, 840.0])
             .with_min_inner_size([1040.0, 700.0])
-            .with_title("Serial MCP")
-            .with_app_id("serial-mcp")
+            .with_title("Termbridge")
+            .with_app_id("termbridge")
             .with_icon(Arc::new(app_icon())),
         ..Default::default()
     };
     eframe::run_native(
-        "Serial MCP",
+        "Termbridge",
         options,
         Box::new(move |cc| Ok(Box::new(App::new(cc, config)?))),
     )
@@ -81,7 +81,7 @@ impl App {
     fn new(cc: &eframe::CreationContext<'_>, config: Arc<ConfigStore>) -> Result<Self, String> {
         theme::install_fonts(&cc.egui_ctx);
         let cfg = config.get();
-        let dark = matches!(cfg.theme, serial_mcp_core::config::Theme::Dark);
+        let dark = matches!(cfg.theme, termbridge_core::config::Theme::Dark);
         let palette = theme::apply(&cc.egui_ctx, dark);
         let rt = tokio::runtime::Builder::new_multi_thread()
             .worker_threads(2)
@@ -411,9 +411,9 @@ impl App {
         self.dark = dark;
         self.palette = theme::apply(ctx, dark);
         let theme = if dark {
-            serial_mcp_core::config::Theme::Dark
+            termbridge_core::config::Theme::Dark
         } else {
-            serial_mcp_core::config::Theme::Light
+            termbridge_core::config::Theme::Light
         };
         self.settings.theme = theme;
         self.config.update(|c| c.theme = theme);
@@ -437,7 +437,7 @@ impl App {
                     widgets::logo(ui, &p, 26.0);
                     ui.add_space(2.0);
                     ui.label(
-                        RichText::new("Serial MCP")
+                        RichText::new("Termbridge")
                             .font(strong_font(16.0))
                             .color(p.text_strong),
                     );
@@ -748,10 +748,10 @@ impl App {
                                     widgets::section_title(ui, &p, "Headless and MCP");
                                     ui.add_space(2.0);
                                     for line in [
-                                        "serial-mcp tui",
-                                        "serial-mcp mcp --transport stdio",
-                                        "serial-mcp serial COM3 --baud 9600 --interactive",
-                                        "serial-mcp tcp-server 9000 --echo",
+                                        "termbridge tui",
+                                        "termbridge mcp --transport stdio",
+                                        "termbridge serial COM3 --baud 9600 --interactive",
+                                        "termbridge tcp-server 9000 --echo",
                                     ] {
                                         ui.label(RichText::new(line).monospace().size(12.0).color(p.text));
                                     }

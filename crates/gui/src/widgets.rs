@@ -488,7 +488,7 @@ pub fn human_rate(bytes_per_sec: f64) -> String {
 }
 
 pub fn human_count(bytes: u64) -> String {
-    serial_mcp_core::util::human_bytes(bytes as usize)
+    termbridge_core::util::human_bytes(bytes as usize)
 }
 
 pub fn human_duration(secs: u64) -> String {

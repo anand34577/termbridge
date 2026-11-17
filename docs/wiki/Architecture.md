@@ -1,6 +1,6 @@
 # Architecture
 
-This page is for people changing the code. Serial MCP is a Cargo workspace with five crates; the binary is built from `crates/cli`.
+This page is for people changing the code. Termbridge is a Cargo workspace with five crates; the binary is built from `crates/cli`.
 
 ```
             ┌──────────────┐   ┌──────────────┐   ┌──────────────┐

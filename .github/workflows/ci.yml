@@ -21,7 +21,7 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libudev-dev pkg-config
       - name: Test core, MCP, TUI and CLI
-        run: cargo test -p serial-mcp-core -p serial-mcp-mcp -p serial-mcp-tui -p serial-mcp --no-default-features --features tui
+        run: cargo test -p termbridge-core -p termbridge-mcp -p termbridge-tui -p termbridge --no-default-features --features tui
 
   gui:
     name: gui check (linux)

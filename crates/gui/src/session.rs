@@ -4,20 +4,20 @@ use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
 use eframe::egui::{self, CornerRadius, Margin, RichText, Stroke, Vec2};
-use serial_mcp_core::checksum::{self, ChecksumKind};
-use serial_mcp_core::codec::{self, ViewFormat};
-use serial_mcp_core::config::{AppConfig, MacroDef};
-use serial_mcp_core::logging::LogFormat;
-use serial_mcp_core::responder::{RuleDef, RuleStatus, MAX_RULES};
-use serial_mcp_core::session::{Parity, SessionConfig};
-use serial_mcp_core::types::SessionKind;
-use serial_mcp_core::{ControlOp, SessionInfo, SessionManager};
+use termbridge_core::checksum::{self, ChecksumKind};
+use termbridge_core::codec::{self, ViewFormat};
+use termbridge_core::config::{AppConfig, MacroDef};
+use termbridge_core::logging::LogFormat;
+use termbridge_core::responder::{RuleDef, RuleStatus, MAX_RULES};
+use termbridge_core::session::{Parity, SessionConfig};
+use termbridge_core::types::SessionKind;
+use termbridge_core::{ControlOp, SessionInfo, SessionManager};
 
 use crate::forms::{flow_label, kind_short};
 use crate::terminal::{self, LineFilter, TerminalBuffer};
 use crate::theme::Palette;
 use crate::widgets::{self, strong_font};
-use serial_mcp_core::validate;
+use termbridge_core::validate;
 
 /// Largest file accepted by "Send file".
 pub const MAX_SEND_FILE: u64 = 16 * 1024 * 1024;
@@ -151,7 +151,7 @@ impl SessionView {
         self.info.as_ref().is_some_and(|i| i.connected)
     }
 
-    fn recording(&self) -> Option<&serial_mcp_core::session::RecordingInfo> {
+    fn recording(&self) -> Option<&termbridge_core::session::RecordingInfo> {
         self.info.as_ref().and_then(|i| i.recording.as_ref())
     }
 
@@ -487,7 +487,7 @@ impl SessionView {
                 &format!("{} / {}", info.rx_packets, info.tx_packets),
                 &format!(
                     "buffer {}",
-                    serial_mcp_core::util::human_bytes(info.log_bytes)
+                    termbridge_core::util::human_bytes(info.log_bytes)
                 ),
                 p.accent,
             );

@@ -5,8 +5,8 @@ use std::time::Instant;
 
 use serde_json::{json, Value};
 
-use serial_mcp_core::config::ConfigStore;
-use serial_mcp_core::SessionManager;
+use termbridge_core::config::ConfigStore;
+use termbridge_core::SessionManager;
 
 use crate::tools;
 use crate::{PROTOCOL_VERSION, SERVER_NAME, SUPPORTED_PROTOCOL_VERSIONS, VERSION};
@@ -160,10 +160,10 @@ impl McpServer {
             },
             "serverInfo": {
                 "name": SERVER_NAME,
-                "title": "Serial MCP",
+                "title": "Termbridge",
                 "version": VERSION
             },
-            "instructions": "Serial MCP is a cross-platform serial / TCP / UDP terminal. \
+            "instructions": "Termbridge is a cross-platform serial / TCP / UDP terminal. \
         Use list_serial_ports to discover ports, open_serial / open_tcp_client / open_tcp_server / open_udp to create a session, \
         write_session to transmit, and read_session (or wait_for_data) to receive. \
         Sessions keep a ring buffer, so read_session with since_seq never loses ordering. \
@@ -174,19 +174,19 @@ impl McpServer {
     fn resource_list(&self) -> Vec<Value> {
         let mut resources = vec![
             json!({
-                "uri": "serial-mcp://info",
+                "uri": "termbridge://info",
                 "name": "Server information",
                 "description": "Version, platform, configuration path and uptime.",
                 "mimeType": "application/json"
             }),
             json!({
-                "uri": "serial-mcp://ports",
+                "uri": "termbridge://ports",
                 "name": "Serial ports",
                 "description": "Serial ports currently visible to the operating system.",
                 "mimeType": "application/json"
             }),
             json!({
-                "uri": "serial-mcp://sessions",
+                "uri": "termbridge://sessions",
                 "name": "Sessions",
                 "description": "All live sessions with counters and status.",
                 "mimeType": "application/json"
@@ -194,12 +194,12 @@ impl McpServer {
         ];
         for session in self.manager.list() {
             resources.push(json!({
-                "uri": format!("serial-mcp://sessions/{}/status", session.id),
+                "uri": format!("termbridge://sessions/{}/status", session.id),
                 "name": format!("{} status", session.label),
                 "mimeType": "application/json"
             }));
             resources.push(json!({
-                "uri": format!("serial-mcp://sessions/{}/log", session.id),
+                "uri": format!("termbridge://sessions/{}/log", session.id),
                 "name": format!("{} log", session.label),
                 "description": "Most recent 64 KiB of session traffic.",
                 "mimeType": "application/json"
@@ -213,15 +213,15 @@ impl McpServer {
             .get("uri")
             .and_then(|u| u.as_str())
             .ok_or_else(|| "missing uri".to_string())?;
-        let text = if uri == "serial-mcp://info" {
+        let text = if uri == "termbridge://info" {
             serde_json::to_string_pretty(&tools::server_info(self)).unwrap_or_default()
-        } else if uri == "serial-mcp://ports" {
-            let ports = serial_mcp_core::net::list_ports().map_err(|e| e.to_string())?;
+        } else if uri == "termbridge://ports" {
+            let ports = termbridge_core::net::list_ports().map_err(|e| e.to_string())?;
             serde_json::to_string_pretty(&json!({ "ports": ports })).unwrap_or_default()
-        } else if uri == "serial-mcp://sessions" {
+        } else if uri == "termbridge://sessions" {
             serde_json::to_string_pretty(&json!({ "sessions": self.manager.list() }))
                 .unwrap_or_default()
-        } else if let Some(rest) = uri.strip_prefix("serial-mcp://sessions/") {
+        } else if let Some(rest) = uri.strip_prefix("termbridge://sessions/") {
             let (id, what) = rest
                 .split_once('/')
                 .ok_or_else(|| format!("invalid session resource: {uri}"))?;
@@ -235,7 +235,7 @@ impl McpServer {
                     .map_err(|e| e.to_string())?;
                 serde_json::to_string_pretty(&tools::render_batch(
                     &batch,
-                    serial_mcp_core::codec::ViewFormat::Ascii,
+                    termbridge_core::codec::ViewFormat::Ascii,
                 ))
                 .unwrap_or_default()
             } else {

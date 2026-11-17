@@ -1,23 +1,23 @@
 # MCP server
 
-The Model Context Protocol (MCP) is how AI assistants call external tools. Serial MCP's server gives an assistant tools to list ports, open sessions, send data, wait for replies, record, and compute checksums.
+The Model Context Protocol (MCP) is how AI assistants call external tools. Termbridge's server gives an assistant tools to list ports, open sessions, send data, wait for replies, record, and compute checksums.
 
 There are two ways to run it:
 
 | Transport | How it runs | Sessions shared with |
 | --- | --- | --- |
-| **stdio** | The assistant starts its own `serial-mcp mcp` process | Nobody else; it's private to that assistant |
-| **HTTP** | Inside the desktop app, the TUI, or `serial-mcp mcp --transport http` | Every client of that endpoint, and the GUI/TUI hosting it |
+| **stdio** | The assistant starts its own `termbridge mcp` process | Nobody else; it's private to that assistant |
+| **HTTP** | Inside the desktop app, the TUI, or `termbridge mcp --transport http` | Every client of that endpoint, and the GUI/TUI hosting it |
 
 Use stdio for "let Claude talk to my board". Use HTTP when you want to watch what the agent does in the GUI, or share one port between several clients.
 
 ## Claude Code
 
 ```bash
-claude mcp add serial-mcp -- /usr/local/bin/serial-mcp mcp --transport stdio
+claude mcp add termbridge -- /usr/local/bin/termbridge mcp --transport stdio
 ```
 
-On Windows, use the full path to `serial-mcp.exe`. The desktop app's **MCP server** page shows this command with the right path, with a Copy button.
+On Windows, use the full path to `termbridge.exe`. The desktop app's **MCP server** page shows this command with the right path, with a Copy button.
 
 ## Claude Desktop and Cursor
 
@@ -26,15 +26,15 @@ Add this to the client's MCP configuration (`claude_desktop_config.json` for Cla
 ```json
 {
   "mcpServers": {
-    "serial-mcp": {
-      "command": "C:\\Tools\\serial-mcp.exe",
+    "termbridge": {
+      "command": "C:\\Tools\\termbridge.exe",
       "args": ["mcp", "--transport", "stdio"]
     }
   }
 }
 ```
 
-Restart the client. `serial-mcp config` prints this snippet with the path of the binary you ran.
+Restart the client. `termbridge config` prints this snippet with the path of the binary you ran.
 
 ## HTTP inside the desktop app
 
@@ -44,7 +44,7 @@ Restart the client. `serial-mcp config` prints this snippet with the path of the
 4. Point HTTP-capable clients at that URL:
 
    ```json
-   { "mcpServers": { "serial-mcp": { "type": "http", "url": "http://127.0.0.1:8765/mcp" } } }
+   { "mcpServers": { "termbridge": { "type": "http", "url": "http://127.0.0.1:8765/mcp" } } }
    ```
 
 Tick **On launch** to start the endpoint whenever the app opens. The top bar shows **MCP online** while it runs.
@@ -72,9 +72,9 @@ If you bind to anything other than a loopback address, the page warns you: the e
 | `udp_scan`, `udp_listen`, `tcp_probe` | Discovery and reachability |
 | `get_server_info` | Version, platform, uptime, config path |
 
-Resources (`serial-mcp://info`, `…/ports`, `…/sessions`, `…/sessions/{id}/status`, `…/sessions/{id}/log`) and two prompts (`diagnose_serial_link`, `echo_test`) are also available.
+Resources (`termbridge://info`, `…/ports`, `…/sessions`, `…/sessions/{id}/status`, `…/sessions/{id}/log`) and two prompts (`diagnose_serial_link`, `echo_test`) are also available.
 
-Request and response examples are in [docs/MCP.md](https://github.com/anand34577/serial-mcp/blob/main/docs/MCP.md).
+Request and response examples are in [docs/MCP.md](https://github.com/anand34577/termbridge/blob/main/docs/MCP.md).
 
 ## Things to ask an agent
 

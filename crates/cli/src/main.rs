@@ -1,4 +1,4 @@
-//! Serial MCP command line interface: GUI, MCP server and headless terminals.
+//! Termbridge command line interface: GUI, MCP server and headless terminals.
 
 use std::io::Write;
 use std::net::SocketAddr;
@@ -10,18 +10,18 @@ use anyhow::{bail, Context};
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use tokio::io::{AsyncBufReadExt, BufReader};
 
-use serial_mcp_core::checksum::ChecksumKind;
-use serial_mcp_core::codec::{self, ViewFormat};
-use serial_mcp_core::config::ConfigStore;
-use serial_mcp_core::session::{FlowControl, Parity};
-use serial_mcp_core::{
+use termbridge_core::checksum::ChecksumKind;
+use termbridge_core::codec::{self, ViewFormat};
+use termbridge_core::config::ConfigStore;
+use termbridge_core::session::{FlowControl, Parity};
+use termbridge_core::{
     Direction, SerialConfig, SessionManager, TcpClientConfig, TcpServerConfig, UdpConfig,
 };
-use serial_mcp_mcp::McpServer;
+use termbridge_mcp::McpServer;
 
 #[derive(Parser)]
 #[command(
-    name = "serial-mcp",
+    name = "termbridge",
     version,
     about = "Serial / TCP / UDP terminal with an MCP server",
     long_about = "A cross-platform serial, TCP and UDP terminal. Run the desktop GUI, expose serial and \
@@ -367,12 +367,12 @@ async fn run_command(
         Command::Mcp { transport, bind } => {
             let server = Arc::new(McpServer::new(manager, config));
             match transport {
-                Transport::Stdio => serial_mcp_mcp::serve_stdio(server).await?,
+                Transport::Stdio => termbridge_mcp::serve_stdio(server).await?,
                 Transport::Http => {
                     let addr: SocketAddr = bind
                         .parse()
                         .with_context(|| format!("invalid bind address: {bind}"))?;
-                    serial_mcp_mcp::serve_http(server, addr).await?;
+                    termbridge_mcp::serve_http(server, addr).await?;
                 }
             }
         }
@@ -412,9 +412,9 @@ fn run_tui(
 ) -> anyhow::Result<()> {
     #[cfg(feature = "tui")]
     {
-        serial_mcp_tui::run_with(
+        termbridge_tui::run_with(
             config,
-            serial_mcp_tui::Options {
+            termbridge_tui::Options {
                 mcp,
                 theme,
                 colors,
@@ -432,7 +432,7 @@ fn run_tui(
 fn run_gui(config: Arc<ConfigStore>) -> anyhow::Result<()> {
     #[cfg(feature = "gui")]
     {
-        serial_mcp_gui::run(config).map_err(|err| anyhow::anyhow!("GUI error: {err}"))
+        termbridge_gui::run(config).map_err(|err| anyhow::anyhow!("GUI error: {err}"))
     }
     #[cfg(not(feature = "gui"))]
     {
@@ -442,7 +442,7 @@ fn run_gui(config: Arc<ConfigStore>) -> anyhow::Result<()> {
 }
 
 fn run_ports() -> anyhow::Result<()> {
-    let ports = serial_mcp_core::net::list_ports()?;
+    let ports = termbridge_core::net::list_ports()?;
     if ports.is_empty() {
         println!("No serial ports found.");
         return Ok(());
@@ -480,7 +480,7 @@ async fn run_serial(args: SerialArgs, manager: &SessionManager) -> anyhow::Resul
         read_timeout_ms: 10,
         label: None,
     };
-    check(serial_mcp_core::validate::serial(&cfg, &[], &[]))?;
+    check(termbridge_core::validate::serial(&cfg, &[], &[]))?;
     check_payload(&args.send, args.hex, &args.eol)?;
     let info = manager.open_serial(cfg).await?;
     println!("session {}: {}", info.id, info.label);
@@ -509,7 +509,7 @@ async fn run_tcp_client(args: TcpClientArgs, manager: &SessionManager) -> anyhow
         connect_timeout_ms: 3000,
         label: None,
     };
-    check(serial_mcp_core::validate::tcp_client(&cfg))?;
+    check(termbridge_core::validate::tcp_client(&cfg))?;
     check_payload(&args.send, args.hex, &args.eol)?;
     let info = manager.open_tcp_client(cfg).await?;
     println!("session {}: {}", info.id, info.label);
@@ -541,7 +541,7 @@ async fn run_tcp_server(args: TcpServerArgs, manager: &SessionManager) -> anyhow
         max_clients: 32,
         label: None,
     };
-    check(serial_mcp_core::validate::tcp_server(&cfg, &[]))?;
+    check(termbridge_core::validate::tcp_server(&cfg, &[]))?;
     let info = manager.open_tcp_server(cfg).await?;
     println!("session {}: {}", info.id, info.label);
     if let Some(log) = args.log {
@@ -587,7 +587,7 @@ async fn run_udp(args: UdpArgs, manager: &SessionManager) -> anyhow::Result<()> 
         broadcast: args.broadcast,
         label: None,
     };
-    check(serial_mcp_core::validate::udp(&cfg, &[]))?;
+    check(termbridge_core::validate::udp(&cfg, &[]))?;
     check_payload(&args.send, args.hex, &args.eol)?;
     let info = manager.open_udp(cfg).await?;
     println!("session {}: {}", info.id, info.label);
@@ -612,14 +612,14 @@ async fn run_scan(args: ScanArgs) -> anyhow::Result<()> {
         Some(hex) => codec::parse_hex(&hex)?,
         None => Vec::new(),
     };
-    let request = serial_mcp_core::discovery::ScanRequest {
+    let request = termbridge_core::discovery::ScanRequest {
         target: args.target,
         port: args.port,
         payload,
         timeout_ms: args.timeout_ms,
         local_port: args.local_port,
     };
-    let responses = serial_mcp_core::discovery::udp_scan(request).await?;
+    let responses = termbridge_core::discovery::udp_scan(request).await?;
     if responses.is_empty() {
         println!("No responses.");
         return Ok(());
@@ -635,7 +635,7 @@ async fn run_scan(args: ScanArgs) -> anyhow::Result<()> {
 }
 
 async fn run_tcp_probe(args: TcpProbeArgs) -> anyhow::Result<()> {
-    let result = serial_mcp_core::net::tcp_probe(
+    let result = termbridge_core::net::tcp_probe(
         &args.host,
         args.port,
         Duration::from_millis(args.timeout_ms.clamp(1, 600_000)),
@@ -660,7 +660,7 @@ async fn run_tcp_probe(args: TcpProbeArgs) -> anyhow::Result<()> {
 }
 
 async fn run_udp_listen(args: UdpListenArgs) -> anyhow::Result<()> {
-    let responses = serial_mcp_core::discovery::udp_listen(
+    let responses = termbridge_core::discovery::udp_listen(
         args.port,
         Duration::from_millis(args.timeout_ms.clamp(1, 600_000)),
     )
@@ -689,8 +689,8 @@ fn run_checksum(args: ChecksumArgs) -> anyhow::Result<()> {
     println!("input: {} bytes  {}", bytes.len(), codec::to_hex(&bytes));
     println!("{:<16} {:<12} FRAME", "ALGORITHM", "CHECKSUM");
     for kind in kinds {
-        let sum = serial_mcp_core::checksum::compute(kind, &bytes);
-        let frame = serial_mcp_core::checksum::append(kind, &bytes);
+        let sum = termbridge_core::checksum::compute(kind, &bytes);
+        let frame = termbridge_core::checksum::append(kind, &bytes);
         println!(
             "{:<16} {:<12} {}",
             kind.label(),
@@ -708,7 +708,7 @@ fn run_config(config: &ConfigStore) -> anyhow::Result<()> {
     let exe = std::env::current_exe()?;
     let snippet = serde_json::json!({
         "mcpServers": {
-            "serial-mcp": {
+            "termbridge": {
                 "command": exe.display().to_string(),
                 "args": ["mcp", "--transport", "stdio"]
             }
@@ -720,11 +720,11 @@ fn run_config(config: &ConfigStore) -> anyhow::Result<()> {
 }
 
 /// Fail early, before opening anything, when settings or data are invalid.
-fn check(report: serial_mcp_core::validate::Report) -> anyhow::Result<()> {
+fn check(report: termbridge_core::validate::Report) -> anyhow::Result<()> {
     let errors: Vec<String> = report
         .issues
         .iter()
-        .filter(|i| i.severity == serial_mcp_core::validate::Severity::Error)
+        .filter(|i| i.severity == termbridge_core::validate::Severity::Error)
         .map(|i| format!("{}: {}", i.field, i.message))
         .collect();
     if errors.is_empty() {
@@ -878,9 +878,9 @@ async fn repl(
                         "rts" | "dtr" | "break" => {
                             let on = matches!(parts.next(), Some("on" | "1" | "true"));
                             let op = match command.split_whitespace().next().unwrap_or("") {
-                                "rts" => serial_mcp_core::ControlOp::Rts(on),
-                                "dtr" => serial_mcp_core::ControlOp::Dtr(on),
-                                _ => serial_mcp_core::ControlOp::Break(on),
+                                "rts" => termbridge_core::ControlOp::Rts(on),
+                                "dtr" => termbridge_core::ControlOp::Dtr(on),
+                                _ => termbridge_core::ControlOp::Break(on),
                             };
                             if let Err(err) = manager.set_control(id, op) {
                                 eprintln!("[error] {err}");

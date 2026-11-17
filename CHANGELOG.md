@@ -4,6 +4,19 @@ All notable changes to this project are listed here. The format follows [Keep a 
 
 ## [Unreleased]
 
+### Changed
+
+- Renamed from Serial MCP to Termbridge. The binary is now `termbridge` and the configuration lives in `termbridge`. An existing `serial-mcp` configuration directory is moved into place on first run, so recent connections, macros and auto-reply rules carry over. `SERIAL_MCP_CONFIG` is still honoured next to `TERMBRIDGE_CONFIG`.
+- Releases now ship three kinds of file instead of one: installers (`.msi` on Windows, `.dmg` on macOS, `.deb` on Linux), portable archives (`.zip` on Windows and macOS, `.tar.gz` on Linux) and bare binaries. Windows and macOS portable archives are now `.zip`, which those systems open without extra tools.
+
+### Added
+
+- `THIRD-PARTY-NOTICES.md`, shipped in every archive, recording the licence of each dependency and the notices that must accompany binary distributions.
+
+### Removed
+
+- References to another vendor's Windows utility from the CLI help, module comments and documentation. The code was never derived from it.
+
 ## [0.1.0] - 2026-11-17
 
 First release.
@@ -23,5 +36,5 @@ First release.
 - Headless commands: `ports`, `serial`, `tcp-client`, `tcp-server`, `udp`, `scan`, `tcp-probe`, `udp-listen`, `checksum`, `config`.
 - Release builds for Windows, macOS and Linux on x86_64, plus ARM64 and ARMv7 Linux and Windows ARM64.
 
-[Unreleased]: https://github.com/anand34577/serial-mcp/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/anand34577/serial-mcp/releases/tag/v0.1.0
+[Unreleased]: https://github.com/anand34577/termbridge/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/anand34577/termbridge/releases/tag/v0.1.0

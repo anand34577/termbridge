@@ -5,12 +5,12 @@ use std::time::{Duration, Instant};
 use base64::Engine;
 use serde_json::{json, Value};
 
-use serial_mcp_core::checksum::{self, ChecksumKind};
-use serial_mcp_core::codec::{self, ViewFormat};
-use serial_mcp_core::config::MacroDef;
-use serial_mcp_core::logging::LogFormat;
-use serial_mcp_core::responder::RuleDef;
-use serial_mcp_core::{
+use termbridge_core::checksum::{self, ChecksumKind};
+use termbridge_core::codec::{self, ViewFormat};
+use termbridge_core::config::MacroDef;
+use termbridge_core::logging::LogFormat;
+use termbridge_core::responder::RuleDef;
+use termbridge_core::{
     net, CoreError, Result, SerialConfig, SessionInfo, TcpClientConfig, TcpServerConfig, UdpConfig,
 };
 
@@ -59,7 +59,7 @@ pub async fn call(server: &McpServer, name: &str, args: &Value) -> Result<Value>
             cfg.dtr = bool_arg(args, "dtr").unwrap_or(cfg.dtr);
             cfg.rts = bool_arg(args, "rts").unwrap_or(cfg.rts);
             cfg.label = str_arg(args, "label");
-            let report = serial_mcp_core::validate::serial(&cfg, &[], &server.manager.list());
+            let report = termbridge_core::validate::serial(&cfg, &[], &server.manager.list());
             if let Some(message) = first_error(&report) {
                 return Err(CoreError::InvalidInput(message));
             }
@@ -75,7 +75,7 @@ pub async fn call(server: &McpServer, name: &str, args: &Value) -> Result<Value>
             cfg.connect_timeout_ms =
                 u64_arg(args, "connect_timeout_ms").unwrap_or(cfg.connect_timeout_ms);
             cfg.label = str_arg(args, "label");
-            let report = serial_mcp_core::validate::tcp_client(&cfg);
+            let report = termbridge_core::validate::tcp_client(&cfg);
             if let Some(message) = first_error(&report) {
                 return Err(CoreError::InvalidInput(message));
             }
@@ -115,7 +115,7 @@ pub async fn call(server: &McpServer, name: &str, args: &Value) -> Result<Value>
                 .transpose()?
                 .unwrap_or(cfg.max_clients);
             cfg.label = str_arg(args, "label");
-            let report = serial_mcp_core::validate::tcp_server(&cfg, &server.manager.list());
+            let report = termbridge_core::validate::tcp_server(&cfg, &server.manager.list());
             if let Some(message) = first_error(&report) {
                 return Err(CoreError::InvalidInput(message));
             }
@@ -131,7 +131,7 @@ pub async fn call(server: &McpServer, name: &str, args: &Value) -> Result<Value>
             cfg.echo = bool_arg(args, "echo").unwrap_or(cfg.echo);
             cfg.broadcast = bool_arg(args, "broadcast").unwrap_or(cfg.broadcast);
             cfg.label = str_arg(args, "label");
-            let report = serial_mcp_core::validate::udp(&cfg, &server.manager.list());
+            let report = termbridge_core::validate::udp(&cfg, &server.manager.list());
             if let Some(message) = first_error(&report) {
                 return Err(CoreError::InvalidInput(message));
             }
@@ -224,7 +224,7 @@ pub async fn call(server: &McpServer, name: &str, args: &Value) -> Result<Value>
                 None => Vec::new(),
             };
             let deadline = Instant::now() + timeout_duration(timeout_ms);
-            let mut chunks: Vec<serial_mcp_core::ring::Chunk> = Vec::new();
+            let mut chunks: Vec<termbridge_core::ring::Chunk> = Vec::new();
             let mut buffered = 0usize;
             let mut next_seq = since;
             loop {
@@ -273,25 +273,25 @@ pub async fn call(server: &McpServer, name: &str, args: &Value) -> Result<Value>
             if let Some(value) = bool_arg(args, "rts") {
                 server
                     .manager
-                    .set_control(&id, serial_mcp_core::ControlOp::Rts(value))?;
+                    .set_control(&id, termbridge_core::ControlOp::Rts(value))?;
                 applied.push(format!("rts={value}"));
             }
             if let Some(value) = bool_arg(args, "dtr") {
                 server
                     .manager
-                    .set_control(&id, serial_mcp_core::ControlOp::Dtr(value))?;
+                    .set_control(&id, termbridge_core::ControlOp::Dtr(value))?;
                 applied.push(format!("dtr={value}"));
             }
             if let Some(value) = bool_arg(args, "break") {
                 server
                     .manager
-                    .set_control(&id, serial_mcp_core::ControlOp::Break(value))?;
+                    .set_control(&id, termbridge_core::ControlOp::Break(value))?;
                 applied.push(format!("break={value}"));
             }
             if let Some(value) = bool_arg(args, "echo") {
                 server
                     .manager
-                    .set_control(&id, serial_mcp_core::ControlOp::Echo(value))?;
+                    .set_control(&id, termbridge_core::ControlOp::Echo(value))?;
                 applied.push(format!("echo={value}"));
             }
             if applied.is_empty() {
@@ -328,7 +328,7 @@ pub async fn call(server: &McpServer, name: &str, args: &Value) -> Result<Value>
             Ok(ok(json!({ "session_id": id, "cleared": true })))
         }
         "udp_scan" => {
-            let request = serial_mcp_core::discovery::ScanRequest {
+            let request = termbridge_core::discovery::ScanRequest {
                 target: str_arg(args, "target")
                     .or_else(|| str_arg(args, "broadcast"))
                     .unwrap_or_else(|| "255.255.255.255".into()),
@@ -340,7 +340,7 @@ pub async fn call(server: &McpServer, name: &str, args: &Value) -> Result<Value>
                 timeout_ms: u64_arg(args, "timeout_ms").unwrap_or(1000),
                 local_port: opt_u16_arg(args, "local_port")?.unwrap_or(0),
             };
-            let responses = serial_mcp_core::discovery::udp_scan(request).await?;
+            let responses = termbridge_core::discovery::udp_scan(request).await?;
             Ok(ok(
                 json!({ "count": responses.len(), "responses": responses }),
             ))
@@ -349,7 +349,7 @@ pub async fn call(server: &McpServer, name: &str, args: &Value) -> Result<Value>
             let port = u16_arg(args, "port")?;
             let timeout_ms = u64_arg(args, "timeout_ms").unwrap_or(2000);
             let responses =
-                serial_mcp_core::discovery::udp_listen(port, timeout_duration(timeout_ms)).await?;
+                termbridge_core::discovery::udp_listen(port, timeout_duration(timeout_ms)).await?;
             Ok(ok(
                 json!({ "count": responses.len(), "responses": responses }),
             ))
@@ -477,7 +477,7 @@ pub fn server_info(server: &McpServer) -> Value {
     json!({
         "name": crate::SERVER_NAME,
         "version": VERSION,
-        "core_version": serial_mcp_core::VERSION,
+        "core_version": termbridge_core::VERSION,
         "protocol_version": PROTOCOL_VERSION,
         "supported_protocol_versions": SUPPORTED_PROTOCOL_VERSIONS,
         "platform": {
@@ -493,7 +493,7 @@ pub fn server_info(server: &McpServer) -> Value {
 }
 
 /// Render a batch of chunks into text plus a structured chunk list.
-pub fn render_batch(batch: &serial_mcp_core::ring::ReadBatch, format: ViewFormat) -> Value {
+pub fn render_batch(batch: &termbridge_core::ring::ReadBatch, format: ViewFormat) -> Value {
     let chunks = render_chunks(&batch.chunks, format);
     json!({
         "text": chunks["text"],
@@ -504,27 +504,27 @@ pub fn render_batch(batch: &serial_mcp_core::ring::ReadBatch, format: ViewFormat
     })
 }
 
-fn render_chunks(chunks: &[serial_mcp_core::ring::Chunk], format: ViewFormat) -> Value {
+fn render_chunks(chunks: &[termbridge_core::ring::Chunk], format: ViewFormat) -> Value {
     let mut text = String::new();
     let mut items = Vec::with_capacity(chunks.len());
     for chunk in chunks {
         let rendered = match chunk.dir {
-            serial_mcp_core::Direction::Info
-            | serial_mcp_core::Direction::Error
-            | serial_mcp_core::Direction::Nvt => codec::escape_bytes(&chunk.data),
+            termbridge_core::Direction::Info
+            | termbridge_core::Direction::Error
+            | termbridge_core::Direction::Nvt => codec::escape_bytes(&chunk.data),
             _ => codec::format_bytes(&chunk.data, format),
         };
         // A chunk that ends with a line break should not add a blank line.
         let rendered = rendered.strip_suffix('\n').unwrap_or(&rendered);
         text.push_str(&format!(
             "[{}] {} {}\n",
-            serial_mcp_core::util::format_ts(chunk.ts_ms, false),
+            termbridge_core::util::format_ts(chunk.ts_ms, false),
             chunk.dir.as_str(),
             rendered
         ));
         items.push(json!({
             "seq": chunk.seq,
-            "ts": serial_mcp_core::util::format_ts(chunk.ts_ms, false),
+            "ts": termbridge_core::util::format_ts(chunk.ts_ms, false),
             "dir": chunk.dir.as_str(),
             "bytes": chunk.data.len(),
             "hex": codec::to_hex(&chunk.data),
@@ -559,11 +559,11 @@ fn timeout_duration(ms: u64) -> Duration {
     Duration::from_millis(ms.min(MAX_TIMEOUT_MS))
 }
 
-fn first_error(report: &serial_mcp_core::validate::Report) -> Option<String> {
+fn first_error(report: &termbridge_core::validate::Report) -> Option<String> {
     report
         .issues
         .iter()
-        .find(|i| i.severity == serial_mcp_core::validate::Severity::Error)
+        .find(|i| i.severity == termbridge_core::validate::Severity::Error)
         .map(|i| format!("{}: {}", i.field, i.message))
 }
 
@@ -636,8 +636,8 @@ fn parse_eol(value: &str) -> Result<Eol> {
     }
 }
 
-fn parse_parity(value: &str) -> Result<serial_mcp_core::session::Parity> {
-    use serial_mcp_core::session::Parity;
+fn parse_parity(value: &str) -> Result<termbridge_core::session::Parity> {
+    use termbridge_core::session::Parity;
     match value.trim().to_ascii_lowercase().as_str() {
         "" | "none" => Ok(Parity::None),
         "even" => Ok(Parity::Even),
@@ -650,8 +650,8 @@ fn parse_parity(value: &str) -> Result<serial_mcp_core::session::Parity> {
     }
 }
 
-fn parse_flow(value: &str) -> Result<serial_mcp_core::session::FlowControl> {
-    use serial_mcp_core::session::FlowControl;
+fn parse_flow(value: &str) -> Result<termbridge_core::session::FlowControl> {
+    use termbridge_core::session::FlowControl;
     match value.trim().to_ascii_lowercase().as_str() {
         "" | "none" => Ok(FlowControl::None),
         "rts_cts" | "rtscts" | "hardware" => Ok(FlowControl::RtsCts),

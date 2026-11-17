@@ -4,12 +4,12 @@ use std::sync::Arc;
 
 use serde_json::{json, Value};
 
-use serial_mcp_core::config::ConfigStore;
-use serial_mcp_core::SessionManager;
-use serial_mcp_mcp::McpServer;
+use termbridge_core::config::ConfigStore;
+use termbridge_core::SessionManager;
+use termbridge_mcp::McpServer;
 
 fn test_server() -> McpServer {
-    let dir = std::env::temp_dir().join(format!("serial-mcp-mcp-test-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("termbridge-mcp-test-{}", std::process::id()));
     let config = Arc::new(ConfigStore::load(Some(&dir.join("config.toml"))));
     McpServer::new(SessionManager::new(), config)
 }
@@ -38,7 +38,7 @@ async fn initialize_negotiates_protocol() {
     )
     .await;
     assert_eq!(response["result"]["protocolVersion"], "2025-03-26");
-    assert_eq!(response["result"]["serverInfo"]["name"], "serial-mcp");
+    assert_eq!(response["result"]["serverInfo"]["name"], "termbridge");
     assert!(response["result"]["capabilities"]["tools"].is_object());
 
     // Unknown protocol revisions fall back to the newest supported one.
@@ -51,7 +51,7 @@ async fn initialize_negotiates_protocol() {
     .await;
     assert_eq!(
         response["result"]["protocolVersion"],
-        serial_mcp_mcp::PROTOCOL_VERSION
+        termbridge_mcp::PROTOCOL_VERSION
     );
 }
 
@@ -177,17 +177,17 @@ async fn resources_and_prompts_are_available() {
     let server = test_server();
     let response = call(&server, 10, "resources/list", json!({})).await;
     let resources = response["result"]["resources"].as_array().unwrap();
-    assert!(resources.iter().any(|r| r["uri"] == "serial-mcp://info"));
+    assert!(resources.iter().any(|r| r["uri"] == "termbridge://info"));
 
     let response = call(
         &server,
         11,
         "resources/read",
-        json!({ "uri": "serial-mcp://info" }),
+        json!({ "uri": "termbridge://info" }),
     )
     .await;
     let text = response["result"]["contents"][0]["text"].as_str().unwrap();
-    assert!(text.contains("serial-mcp"));
+    assert!(text.contains("termbridge"));
 
     let response = call(&server, 12, "prompts/list", json!({})).await;
     assert!(response["result"]["prompts"].as_array().unwrap().len() >= 2);

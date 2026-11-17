@@ -1,14 +1,14 @@
 //! "New connection" dialog: transport picker plus validated forms.
 
 use eframe::egui::{self, Color32, CornerRadius, Margin, RichText, Stroke, Vec2};
-use serial_mcp_core::net::PortInfo;
-use serial_mcp_core::session::{FlowControl, Parity, SessionConfig};
-use serial_mcp_core::types::SessionKind;
-use serial_mcp_core::{SerialConfig, SessionInfo, TcpClientConfig, TcpServerConfig, UdpConfig};
+use termbridge_core::net::PortInfo;
+use termbridge_core::session::{FlowControl, Parity, SessionConfig};
+use termbridge_core::types::SessionKind;
+use termbridge_core::{SerialConfig, SessionInfo, TcpClientConfig, TcpServerConfig, UdpConfig};
 
 use crate::theme::Palette;
 use crate::widgets::{self, strong_font};
-use serial_mcp_core::validate::{self, Report, Severity};
+use termbridge_core::validate::{self, Report, Severity};
 
 pub const BAUD_RATES: &[u32] = &[
     300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 76800, 115200, 230400,

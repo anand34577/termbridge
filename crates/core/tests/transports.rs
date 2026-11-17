@@ -2,7 +2,7 @@
 
 use std::time::{Duration, Instant};
 
-use serial_mcp_core::{Direction, SessionManager, TcpClientConfig, TcpServerConfig, UdpConfig};
+use termbridge_core::{Direction, SessionManager, TcpClientConfig, TcpServerConfig, UdpConfig};
 
 fn port_from_peer(peer: &str) -> u16 {
     peer.rsplit(':')
@@ -138,8 +138,8 @@ async fn sessions_report_counters_and_close() {
 async fn missing_serial_port_is_reported() {
     let manager = SessionManager::new();
     let result = manager
-        .open_serial(serial_mcp_core::SerialConfig {
-            port: "serial-mcp-no-such-port".into(),
+        .open_serial(termbridge_core::SerialConfig {
+            port: "termbridge-no-such-port".into(),
             ..Default::default()
         })
         .await;
@@ -162,11 +162,11 @@ async fn control_lines_are_validated_per_transport() {
 
     // Echo is valid on a TCP server.
     manager
-        .set_control(&server.id, serial_mcp_core::ControlOp::Echo(true))
+        .set_control(&server.id, termbridge_core::ControlOp::Echo(true))
         .unwrap();
     // RTS is not.
     assert!(manager
-        .set_control(&server.id, serial_mcp_core::ControlOp::Rts(true))
+        .set_control(&server.id, termbridge_core::ControlOp::Rts(true))
         .is_err());
     // Unknown sessions are rejected.
     assert!(manager.write("nope", b"x").is_err());
@@ -175,8 +175,8 @@ async fn control_lines_are_validated_per_transport() {
 
 #[tokio::test]
 async fn auto_responder_and_csv_recording() {
-    use serial_mcp_core::logging::LogFormat;
-    use serial_mcp_core::responder::RuleDef;
+    use termbridge_core::logging::LogFormat;
+    use termbridge_core::responder::RuleDef;
 
     let manager = SessionManager::new();
     let server = manager
@@ -199,7 +199,7 @@ async fn auto_responder_and_csv_recording() {
             }],
         )
         .unwrap();
-    let dir = std::env::temp_dir().join(format!("serial-mcp-rec-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("termbridge-rec-{}", std::process::id()));
     let path = dir.join("server.csv");
     manager
         .set_logging_with(&server.id, Some(path.clone()), false, LogFormat::Csv)

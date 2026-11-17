@@ -19,7 +19,7 @@ If opening fails (the port is busy, the host refuses), the error appears as a no
 
 **Recent** in the sidebar remembers the last eight connections. Click one to reopen the dialog pre-filled; right-click → **Forget** to remove it.
 
-![The New connection dialog](https://raw.githubusercontent.com/anand34577/serial-mcp/main/assets/screenshot-new-connection.png)
+![The New connection dialog](https://raw.githubusercontent.com/anand34577/termbridge/main/assets/screenshot-new-connection.png)
 
 ## The session screen
 
@@ -62,7 +62,7 @@ Sends one UDP datagram to a broadcast or unicast address and lists every reply w
 - **Representations** converts between text with escapes, hex, a C array, decimal, binary and Base64. Type in any of four input formats.
 - **Checksums** shows CRC-16 Modbus, CRC-16 CCITT, CRC-16 XMODEM, CRC-32, LRC, XOR and SUM-8 for the input, plus the full frame with a Modbus CRC.
 
-![The Tools page](https://raw.githubusercontent.com/anand34577/serial-mcp/main/assets/screenshot-tools.png)
+![The Tools page](https://raw.githubusercontent.com/anand34577/termbridge/main/assets/screenshot-tools.png)
 
 ## Keyboard shortcuts
 

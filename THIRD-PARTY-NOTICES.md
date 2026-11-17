@@ -1,6 +1,6 @@
 # Third-party notices
 
-Serial MCP is MIT licensed (see [LICENSE](LICENSE)). It is built from the
+Termbridge is MIT licensed (see [LICENSE](LICENSE)). It is built from the
 Rust crates listed in `Cargo.lock`. Those crates are not vendored or modified;
 they are compiled as published on crates.io. This file records the licences
 they carry and the notice obligations that come with them.

@@ -1,4 +1,4 @@
-//! Terminal user interface for Serial MCP (ratatui + crossterm).
+//! Terminal user interface for Termbridge (ratatui + crossterm).
 //!
 //! Runs everywhere a terminal does, including SSH sessions and headless ARM
 //! boards. Shares the session engine, configuration, macros and recent
@@ -24,18 +24,18 @@ use ratatui::widgets::{
 };
 use ratatui::{DefaultTerminal, Frame};
 
-use serial_mcp_core::checksum::{self, ChecksumKind};
-use serial_mcp_core::codec::{self, ViewFormat};
-use serial_mcp_core::config::ConfigStore;
-use serial_mcp_core::logging::LogFormat;
-use serial_mcp_core::net::{self, PortInfo};
-use serial_mcp_core::session::SessionConfig;
-use serial_mcp_core::types::{Direction, SessionKind};
-use serial_mcp_core::util::human_bytes;
-use serial_mcp_core::validate;
-use serial_mcp_core::view::{dir_tag, TerminalBuffer};
-use serial_mcp_core::{ControlOp, SessionInfo, SessionManager};
-use serial_mcp_mcp::McpServer;
+use termbridge_core::checksum::{self, ChecksumKind};
+use termbridge_core::codec::{self, ViewFormat};
+use termbridge_core::config::ConfigStore;
+use termbridge_core::logging::LogFormat;
+use termbridge_core::net::{self, PortInfo};
+use termbridge_core::session::SessionConfig;
+use termbridge_core::types::{Direction, SessionKind};
+use termbridge_core::util::human_bytes;
+use termbridge_core::validate;
+use termbridge_core::view::{dir_tag, TerminalBuffer};
+use termbridge_core::{ControlOp, SessionInfo, SessionManager};
+use termbridge_mcp::McpServer;
 
 use form::{ConnectForm, Value};
 use theme::{glyphs, th};
@@ -307,7 +307,7 @@ impl App {
             let shutdown = async {
                 let _ = rx.await;
             };
-            if let Err(err) = serial_mcp_mcp::serve_http_listener(server, listener, shutdown).await
+            if let Err(err) = termbridge_mcp::serve_http_listener(server, listener, shutdown).await
             {
                 tracing::error!("MCP HTTP server stopped: {err}");
             }
@@ -1115,7 +1115,7 @@ impl App {
             .count();
         let mut spans = vec![
             Span::styled(
-                " Serial MCP ",
+                " Termbridge ",
                 Style::new().fg(th().strong).add_modifier(Modifier::BOLD),
             ),
             Span::styled(
@@ -2220,7 +2220,7 @@ mod tests {
 
     #[test]
     fn full_keyboard_flow() {
-        let dir = std::env::temp_dir().join(format!("serial-mcp-tui-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("termbridge-tui-{}", std::process::id()));
         let config = Arc::new(ConfigStore::load(Some(&dir.join("config.toml"))));
         let mut app = App::new(config).unwrap();
         assert!(screen(&mut app).contains("Start a session"));
@@ -2230,7 +2230,7 @@ mod tests {
             .rt
             .block_on(
                 app.manager
-                    .open_tcp_server(serial_mcp_core::TcpServerConfig {
+                    .open_tcp_server(termbridge_core::TcpServerConfig {
                         bind: "127.0.0.1".into(),
                         port: 0,
                         echo: true,
@@ -2373,14 +2373,14 @@ mod tests {
 
     #[test]
     fn send_file_dialog_validates_and_queues() {
-        let dir = std::env::temp_dir().join(format!("serial-mcp-tui-file-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("termbridge-tui-file-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let config = Arc::new(ConfigStore::load(Some(&dir.join("config.toml"))));
         let mut app = App::new(config).unwrap();
         app.rt
             .block_on(
                 app.manager
-                    .open_tcp_server(serial_mcp_core::TcpServerConfig {
+                    .open_tcp_server(termbridge_core::TcpServerConfig {
                         bind: "127.0.0.1".into(),
                         port: 0,
                         ..Default::default()

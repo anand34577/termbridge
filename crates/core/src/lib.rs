@@ -1,4 +1,4 @@
-//! Serial MCP core: cross-platform serial, TCP and UDP terminal transports.
+//! Termbridge core: cross-platform serial, TCP and UDP terminal transports.
 
 pub mod checksum;
 pub mod codec;

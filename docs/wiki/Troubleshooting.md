@@ -6,11 +6,11 @@ Error messages are quoted as they appear, so you can search this page for the te
 
 ### `open COM5: The system cannot find the file specified.`
 
-The port doesn't exist (any more). The adapter was unplugged, Windows gave it a new number, or there's a typo. Run `serial-mcp ports` or use **Detected** / **Rescan** in the New connection dialog.
+The port doesn't exist (any more). The adapter was unplugged, Windows gave it a new number, or there's a typo. Run `termbridge ports` or use **Detected** / **Rescan** in the New connection dialog.
 
 ### `open COM5: Access is denied.`
 
-Another program has the port open: Arduino IDE, PuTTY, a vendor tool, or another Serial MCP session. Windows allows one program per port. Close the other program and try again.
+Another program has the port open: Arduino IDE, PuTTY, a vendor tool, or another Termbridge session. Windows allows one program per port. Close the other program and try again.
 
 ### `open /dev/ttyUSB0: Permission denied`
 
@@ -60,7 +60,7 @@ Sending to `255.255.255.255` or a subnet broadcast like `192.168.1.255` needs **
 ### Discovery finds nothing
 
 - Broadcasts don't cross routers; the device has to be on the same subnet.
-- The firewall may drop the replies. On Windows, allow `serial-mcp.exe` on private networks when asked.
+- The firewall may drop the replies. On Windows, allow `termbridge.exe` on private networks when asked.
 - Many devices only answer their vendor's probe bytes; put them in **Payload (hex)**.
 
 ## Sending data
@@ -81,9 +81,9 @@ Write bytes as `\x0D`, not `\xD` or `\x`.
 
 ### The agent says the server isn't available
 
-- Check the path in the client config points at the real binary. `serial-mcp config` prints a snippet with the correct path.
+- Check the path in the client config points at the real binary. `termbridge config` prints a snippet with the correct path.
 - Restart the client after editing its config.
-- Run the command from the config yourself. `serial-mcp mcp --transport stdio` should start and wait silently.
+- Run the command from the config yourself. `termbridge mcp --transport stdio` should start and wait silently.
 
 ### `invalid socket address syntax`
 
@@ -91,13 +91,13 @@ The `--bind` value must be an IP and port, like `127.0.0.1:8765`. Host names suc
 
 ### The GUI's sessions don't show up for the agent
 
-A stdio client starts its own private process. To share sessions, start the HTTP endpoint on the GUI's **MCP server** page (or `serial-mcp tui --mcp 127.0.0.1:8765`) and point the client at `http://127.0.0.1:8765/mcp`.
+A stdio client starts its own private process. To share sessions, start the HTTP endpoint on the GUI's **MCP server** page (or `termbridge tui --mcp 127.0.0.1:8765`) and point the client at `http://127.0.0.1:8765/mcp`.
 
 ## Terminal UI
 
 ### Boxes, question marks or broken lines
 
-The terminal font lacks some symbols. Use `serial-mcp tui --ascii`, or set `SERIAL_MCP_GLYPHS=ascii`.
+The terminal font lacks some symbols. Use `termbridge tui --ascii`, or set `TERMBRIDGE_GLYPHS=ascii`.
 
 ### Colours look wrong or washed out
 
@@ -115,7 +115,7 @@ Make the window larger or reduce the font size.
 
 ### The app doesn't start on Linux
 
-The GUI needs X11 or Wayland with OpenGL. Over SSH or on a server, use `serial-mcp tui`. If you have a desktop and it still fails, run `serial-mcp gui -v` and include the output in an issue.
+The GUI needs X11 or Wayland with OpenGL. Over SSH or on a server, use `termbridge tui`. If you have a desktop and it still fails, run `termbridge gui -v` and include the output in an issue.
 
 ### Windows says the app is from an unknown publisher
 

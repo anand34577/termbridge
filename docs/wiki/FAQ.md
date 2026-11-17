@@ -6,7 +6,7 @@ Text mode accepts `\r`, `\n`, `\t`, `\0`, `\xNN` for any byte, `$NN` for hex and
 
 ### Does it support RS-485?
 
-Yes, through a USB-to-RS-485 adapter that handles direction switching itself, which almost all of them do. Serial MCP sees it as an ordinary serial port.
+Yes, through a USB-to-RS-485 adapter that handles direction switching itself, which almost all of them do. Termbridge sees it as an ordinary serial port.
 
 ### Does it support Modbus?
 
@@ -14,7 +14,7 @@ It doesn't decode Modbus, but it makes sending Modbus RTU frames easy: type the 
 
 ### Can two programs use the same serial port?
 
-Not at the OS level; a serial port has one owner. Within Serial MCP, the GUI or TUI and any number of MCP clients connected to its HTTP endpoint can all use the same session at once.
+Not at the OS level; a serial port has one owner. Within Termbridge, the GUI or TUI and any number of MCP clients connected to its HTTP endpoint can all use the same session at once.
 
 ### Is RFC 2217 (serial over Telnet) supported?
 
