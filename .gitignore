@@ -1,0 +1,14 @@
+/target
+**/*.rs.bk
+*.log
+*.pdb
+.DS_Store
+.idea/
+.vscode/
+dist/
+*.csv
+*.bin
+.env
+Thumbs.db
+desktop.ini
+assets/src/node_modules/

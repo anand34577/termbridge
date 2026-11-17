@@ -1,0 +1,16 @@
+[package]
+name = "serial-mcp-tui"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Terminal user interface for Serial MCP"
+
+[dependencies]
+serial-mcp-core = { workspace = true }
+serial-mcp-mcp = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+ratatui = "0.30"

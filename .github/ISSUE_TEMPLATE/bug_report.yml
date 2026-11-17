@@ -1,0 +1,41 @@
+name: Bug report
+description: Something doesn't work the way the docs say it should
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you got instead.
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Which part
+      options: [Desktop GUI, Terminal UI, MCP server, Headless CLI]
+    validations:
+      required: true
+  - type: dropdown
+    id: transport
+    attributes:
+      label: Transport
+      options: [Serial, TCP client, TCP server, UDP, Discovery, Not transport related]
+  - type: input
+    id: version
+    attributes:
+      label: Version and platform
+      description: Output of `serial-mcp --version`, plus OS and CPU (for example Windows 11 x64, Raspberry Pi OS arm64).
+    validations:
+      required: true
+  - type: textarea
+    id: device
+    attributes:
+      label: Device or adapter
+      description: For serial problems, the USB adapter or device and the port settings (baud, parity, flow control).
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Run with `-v` and paste the relevant lines. A short CSV recording of the traffic helps too.
+      render: text

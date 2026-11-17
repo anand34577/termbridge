@@ -1,0 +1,30 @@
+[package]
+name = "serial-mcp"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Cross-platform serial / TCP / UDP terminal with MCP server and headless mode"
+
+[[bin]]
+name = "serial-mcp"
+path = "src/main.rs"
+
+[features]
+default = ["gui", "tui", "udev"]
+udev = ["serial-mcp-core/udev"]
+gui = ["dep:serial-mcp-gui"]
+tui = ["dep:serial-mcp-tui"]
+
+[dependencies]
+serial-mcp-core = { workspace = true }
+serial-mcp-mcp = { workspace = true }
+serial-mcp-gui = { workspace = true, optional = true }
+serial-mcp-tui = { workspace = true, optional = true }
+tokio = { workspace = true }
+clap = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+toml = { workspace = true }

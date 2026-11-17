@@ -1,0 +1,61 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/core",
+    "crates/mcp",
+    "crates/gui",
+    "crates/tui",
+    "crates/cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.95"
+license = "MIT"
+authors = ["Serial MCP contributors"]
+repository = "https://github.com/anand34577/serial-mcp"
+description = "Cross-platform serial / TCP / UDP terminal with an MCP server and headless mode"
+
+[workspace.dependencies]
+serial-mcp-core = { path = "crates/core", default-features = false }
+serial-mcp-mcp = { path = "crates/mcp" }
+serial-mcp-gui = { path = "crates/gui" }
+serial-mcp-tui = { path = "crates/tui" }
+
+tokio = { version = "1.47", features = [
+    "rt-multi-thread",
+    "macros",
+    "net",
+    "io-util",
+    "io-std",
+    "sync",
+    "time",
+    "signal",
+] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+base64 = "0.22"
+chrono = { version = "0.4", features = ["serde"] }
+serialport = { version = "4.10", default-features = false }
+dirs = "5"
+toml = "0.8"
+clap = { version = "4.5", features = ["derive"] }
+axum = "0.8"
+bytes = "1"
+eframe = { version = "0.37", default-features = false, features = [
+    "default_fonts",
+    "glow",
+    "wayland",
+    "x11",
+] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+opt-level = 3

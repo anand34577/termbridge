@@ -1,0 +1,23 @@
+[package]
+name = "serial-mcp-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Transport core for Serial MCP: serial, TCP client/server and UDP sessions"
+
+[features]
+default = ["udev"]
+# USB metadata (VID/PID, product) for Linux serial ports via libudev.
+# Without it ports are still enumerated from /sys/class/tty.
+udev = ["serialport/libudev"]
+
+[dependencies]
+tokio = { workspace = true }
+serialport = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+dirs = { workspace = true }
+toml = { workspace = true }

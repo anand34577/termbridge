@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "serial-mcp": {
+      "command": "serial-mcp",
+      "args": ["mcp", "--transport", "stdio"]
+    }
+  }
+}
